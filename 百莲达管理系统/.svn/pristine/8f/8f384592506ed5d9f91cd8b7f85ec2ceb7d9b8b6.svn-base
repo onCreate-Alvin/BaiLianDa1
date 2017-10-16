@@ -1,0 +1,5 @@
+package situ.bld.util;
+
+public interface importdata_listenter {
+public void msg(int bz,int count,String sql);
+}

@@ -1,0 +1,8 @@
+"data":[
+{"tablename":"Course","colname":"name","type":5,"url":"AllSeach/School","lable":"学校"},
+{"tablename":"Course","colname":"index","type":5,"rely":0,"url":"AllSeach/School_College","lable":"学院"},
+{"tablename":"Course","colname":"sex","type":6,"url":"AllSeach/Array?name=sex","lable":"性别"},
+{"tablename":"Course","colname":"count","type":0,"lable":"数量"}
+,
+{"tablename":"Course","colname":"exp","type":2,"lable":"姓名"}
+]

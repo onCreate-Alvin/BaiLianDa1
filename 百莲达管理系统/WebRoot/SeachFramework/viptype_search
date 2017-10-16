@@ -1,0 +1,4 @@
+"data":[
+{"tablename":"viptype","colname":"name","type":2,"lable":"会员类型名称"},
+{"tablename":"viptype","colname":"fexp","type":2,"lable":"备注"}
+]

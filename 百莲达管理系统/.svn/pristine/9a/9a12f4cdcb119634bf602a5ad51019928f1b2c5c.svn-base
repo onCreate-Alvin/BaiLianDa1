@@ -1,0 +1,9 @@
+package utils;
+
+public class tools {
+		public static String[][] sexnames =  new String[][]{{"0","男"},{"1","女"}};
+		public static String[][] operatorstatus = new String[][]{{"0","操作员"},{"1","职工"},{"2","离职"},{"3","临时工"}};
+		
+		public static String[][] viplevel = new String[][]{{"0","普通"},{"1","白银"},{"2","黄金"},{"3","蓝钻"}};
+		public static String[][] productstatus =  new String[][]{{"0","可用"},{"1","禁用"},{"2","缺货"}};
+}

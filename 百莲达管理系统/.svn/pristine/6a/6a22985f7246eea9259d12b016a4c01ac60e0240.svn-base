@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>全部商品信息</title>
+	<link rel="stylesheet" type="text/css" href="../uimaker/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../uimaker/icon.css">
+	<link rel="stylesheet" type="text/css" href="../uimaker/panel.css">
+	<link rel="stylesheet" type="text/css" href="../uimaker/linkbutton.css">
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+</head>
+<body >
+	<table id="dg" style="width:100%;margin-top: 10px" title="全体供应商列表" s>
+		
+	</table>
+  <div id="tb" style="padding:0 10px;">
+ 			<a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="openAdd()" plain="true">添加</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-edit" onclick="openEdit()" plain="true">修改</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove()" plain="true">删除</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="cancel()" plain="true">取消</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-reload" onclick="reload()" plain="true">刷新</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-print" onclick="openAdd()" plain="true">打印</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-back" onclick="reload()" plain="true">返回</a>
+             <a href="javascript:search();"  class="easyui-linkbutton" iconCls="icon-search">查询</a>
+  </div>
+	<script>
+		$('#dg').datagrid({
+		url:'product/init',//数据源
+		rownumbers:true,
+		singleSelect:true,
+		autoRowHeight:false,
+		pageSize:10,  
+		collapsible:true,  
+		striped:true,       
+		pagination:true,
+		multiSort:true,
+		toolbar:'#tb',
+		fitColumns:true,
+		fit:true,
+		columns:[[
+			{ field:'code',title:'账号',width:100,sortable:true},
+			{ field:'name',title:'密码',width:180,sortable:true},
+			{ field:'nickname',title:'昵称',width:100},
+			{ field:'email',title:'邮箱',width:100},
+			{ field:'createdate',title:'创建时间',width:100},
+			{ field:'lastdate',title:'最后登录时间',width:100},
+			{ field:'status',title:'状态',width:100}
+		]]
+	});
+
+		/* function getData(){
+			var rows = [];
+			for(var i=1; i<=800; i++){
+				rows.push({
+					code: '10695',
+					name: '南京天泽星网股份有限公司',
+					level: '正式',
+					provide: '光纤通信设备配件',
+					full: '',
+					issubmit: '已审核',
+					note: '-'
+				});
+			}
+			return rows;
+		}
+		
+		$(function(){
+			$('#dg').datagrid({data:getData()});
+		}); */
+	</script>
+</body>
+</html>

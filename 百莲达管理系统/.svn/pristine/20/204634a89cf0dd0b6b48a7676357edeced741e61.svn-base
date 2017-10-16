@@ -1,0 +1,42 @@
+function openchongzhi(url) {
+		$('#chognzhi').form('clear');
+		$('#chongzhi').dialog({
+			closed : false,
+			modal : false,
+			title : "会员充值",
+			top : 100,
+			left : 280,
+			width : 950,
+			height : 400,
+			href:url,
+			buttons : [ {
+				text : '确定',
+				iconCls : 'icon-ok',
+				handler : addchongzhi
+			}, {
+				text : '取消',
+				iconCls : 'icon-cancel',
+				handler : function() {
+					$('#chongzhi').dialog('close');
+				}
+			} ]
+		});
+	}
+	function addchongzhi(){
+	alert(1);
+		$('#chongzhiform').form('submit', {
+			url:'ordermain/insert',
+			success:function(data){
+				if(data){
+					$.messager.alert('信息提示','提交成功！','info');
+					$('#chongzhi').dialog('close');
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+    
+	

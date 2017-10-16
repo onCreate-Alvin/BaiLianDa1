@@ -1,0 +1,15 @@
+"data":[
+{"tablename":"product","colname":"code","type":2,"lable":"商品编号"},
+{"tablename":"product","colname":"zjm","type":2,"lable":"商品助记码"},
+{"tablename":"product","colname":"name","type":2,"lable":"商品名称"},
+{"tablename":"product","colname":"peso","type":2,"lable":"商品重量"},
+{"tablename":"product","colname":"mode","type":2,"lable":"商品模式"},
+{"tablename":"product","colname":"unit","type":2,"lable":"商品单位"},
+{"tablename":"product","colname":"producttypeid","type":5,"url":"../AllSeach/producttype","lable":"商品类型"},
+{"tablename":"product","colname":"defaultprice","type":1,"lable":"默认价格"},
+{"tablename":"product","colname":"defaultpoint","type":1,"lable":"默认积分"},
+{"tablename":"product","colname":"status","type":6,"url":"../AllSeach/Array?name=productstatus","lable":"商品状态"},
+{"tablename":"product","colname":"createdate","type":3,"lable":"创建时间"},
+{"tablename":"product","colname":"userid","type":5,"url":"../AllSeach/user","lable":"创建人"},
+{"tablename":"product","colname":"fexp","type":2,"lable":"备注"}
+]

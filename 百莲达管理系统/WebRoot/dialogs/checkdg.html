@@ -1,0 +1,163 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+
+</head>
+<body>
+	<form id="checkstore" method="post">
+		<table style="width: 900px;margin: auto"  >
+			<tr>
+			<td width="60" style="text-align:right">选择分店:</td>
+			<td><input type="text"  class="easyui-combobox margintop10" name="shopid"  data-options=" required:true,editable:false,valueField:'id',textField:'name',url:'/bld/vip/shoplist'"/></td>
+			<td width="60" align="right">盘点日期:</td>
+             <td><input type="text" name="checkdate" class="easyui-datebox"  data-options="editable:false,required:true"/></td>
+			
+			</tr>
+			
+			<tr>
+				<td width="60" style="text-align:right">盘点编号:</td>
+				<td ><input  type="text" name="checkcode" class="easyui-validatebox margintop10 " data-options="editable:true"/></td>
+				<td width="60" style="text-align:right">盘点名称:</td>
+				<td ><input  type="text" name="checkname" class="easyui-validatebox  " data-options="editable:true"/></td>
+				<td><input type="button" class="btn " value="添加商品" onclick="openAddP();"></td>
+			</tr>
+			<tr style="height: 240px">
+				<td colspan="8" width="100%">
+				
+				
+				<div name="checkdetailsdg" id="checkdetailsdg">
+				</div>
+				
+				
+				</td>
+			</tr>
+			
+			</table>
+		</form>
+		
+		<div id="addproduct" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'">
+			<form action="" id="checkdetail">
+				<table style="margin: 10px">
+				<tr>
+				<td width="60" >选择商品：</td>
+				<td><input type="text"  class="easyui-combobox margintop10 " name="productid" data-options=" required:true,editable:true,valueField:'id',textField:'zjm',url:'/bld/AllSeach/product'"></td>
+				</tr>
+				<tr>
+				<td width="60" >商品名称：</td>
+				<td><input  type="text" name="productname" class="easyui-validatebox noborder margintop10 " data-options="editable:false"/></td>
+				</tr>
+				<tr>
+				<td width="60" >商品数量：</td>
+				<td><input  type="number" min="1"  name="count" class="easyui-validatebox margintop10 " data-options="editable:true, required:true"/></td>
+				</tr>
+				<tr>
+				<td width="60" >备注：</td>
+				<td><textarea  name ="fexp" rows="1"style="resize: none;width: 150px"></textarea></td>
+				</tr>
+				</table>
+			</form>
+		</div>
+	<script type="text/javascript">
+		$("[name=productid]").combobox({
+				onSelect: function (rec) {
+					$("[name='productname']").val(rec.name);
+				}
+			});
+	
+		var mydata=[];
+		
+		function openAddP(){
+
+		$('#addproduct').dialog({
+			closed: false,
+			modal:true,
+            title: "选择商品",
+            top:170,
+            left:500,
+            buttons: [{
+                text: '保存',
+                iconCls: 'icon-ok',
+                handler: submitdetail
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#addproduct').dialog('close');                    
+                }
+            }]
+        });
+
+		}
+		
+		function submitdetail(){
+	    $('#checkdetail').form('submit', {
+			url:'/bld/checkdetail/zjm',
+			success:function(data){
+				if(data){
+				var json = eval('(' + data + ')'); 
+				mydata.push(json);
+				$('#checkdetailsdg').datagrid({
+					data:mydata
+				});
+					 $('#addproduct').dialog('close');
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		}); 
+		
+		}
+
+		$('#checkdetailsdg').datagrid({
+			rownumbers:false,
+			singleSelect:true,
+			autoRowHeight:false,
+			striped:true,       
+			pagination:false,
+			fitColumns:true,
+			fit:true,
+			columns:[[
+				{field:'pcode',title:'商品编号',width:100,sortable:true},
+				{ field:'pname',title:'商品名称',width:180,sortable:true},
+				{ field:'pstatus',title:'商品状态',width:100,sortable:true},
+				{ field:'count',title:'数量',width:100,sortable:true},
+				{ field:'fexp',title:'备注',width:100,sortable:true},
+				{field:'opt',title:'操作' ,align:'center',
+					formatter:function(value,rec){
+						var btn = "<a class='' href='javascript:void(0)' onclick='deleterow(this)'>删除</a>"
+						return btn;						
+					}
+				}
+			]],
+		});
+		
+		function deleterow(target){
+		$.messager.confirm('Confirm','确定删除？',function(r){
+			if (r){
+				$('#checkdetailsdg').datagrid('deleteRow', getRowIndex(target));
+				resum();
+			}
+		});
+		}
+		function getRowIndex(target){
+		var tr = $(target).closest('tr.datagrid-row');
+		return parseInt(tr.attr('datagrid-row-index'));
+	}
+	
+	</script>
+<style type="text/css">
+.margintop10{
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+.noborder{
+border: 0px;
+}
+</style>
+</body>
+</html>

@@ -1,0 +1,7 @@
+package service;
+
+import model.user;
+
+public interface user_service extends BasicService<user>{
+
+}

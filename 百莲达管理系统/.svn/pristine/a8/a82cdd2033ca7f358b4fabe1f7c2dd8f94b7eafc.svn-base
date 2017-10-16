@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="../uimaker/easyui.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/icon.css" />
+<link rel="stylesheet" type="text/css" href="../uimaker/panel.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/linkbutton.css">
+
+<script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../easyui/1.5.3/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../js/print.js"></script>
+<script type="text/javascript" src="../SeachFramework/seach.js"></script>
+</head>
+<body >
+    <!-- Begin of toolbar -->
+    <div id="producttb">
+       <a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="openAdd()" plain="true">添加</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-edit" onclick="openEdit()" plain="true">修改</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove1()" plain="true">删除</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-reload" onclick="reload()" plain="true">刷新</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-print" onclick="openPrint()" plain="true">打印</a>
+       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="openSearch()">查询</a>
+       <a href="javascript:void(0)" isopen="0" onclick="batchop(this)"  class="easyui-linkbutton" >打开批量处理</a>
+    </div>
+    <!-- End of toolbar -->
+    <table id="productdg" class="easyui-datagrid"></table>
+
+<!-- Begin of easyui-dialog -->
+<div id="product_dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:520px; padding:10px;">
+	<form id="product_form" method="post">
+        <table>
+            <tr>
+                <td width="60" align="right">商品编码:</td>
+                <td><input type="text" name="code"  class="easyui-validatebox"  data-options="required:true"/></td>
+            	<td width="80" align="right">商品类型:</td>
+                 <td><input type="text"  class="easyui-combobox" name="producttypeid"  data-options=" required:true,editable:false,valueField:'id',textField:'name',url:'../product/typelist'"></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">商品型号:</td>
+                <td><input type="text" name="mode"  class="easyui-validatebox"  data-options="required:true"/></td>
+            	<td width="80" align="right">商品状态:</td>
+                 <td><input type="text"  class="easyui-combobox" name="status"  data-options=" required:true,editable:false,valueField:'0',textField:'1',url:'../product/statuslist'"></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">商品名称:</td>
+                <td colspan="3"><input style="width:400px" type="text" name="name" class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+             <tr>
+                <td width="60" align="right">商品重量:</td>
+                <td><input type="text" name="peso"  class="easyui-validatebox"  data-options="required:true"/></td>
+            	<td width="80" align="right">商品单价:</td>
+                <td><input type="text" name="defaultprice" class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+             <tr>
+                <td width="60" align="right">商品单位:</td>
+                <td><input type="text" name="unit"  class="easyui-validatebox"  data-options="required:true"/></td>
+            	<td width="80" align="right">商品积分:</td>
+                <td><input type="text" name="defaultpoint" class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+            <tr>
+                <td valign="top" align="right">备注:</td>
+                <td colspan="3"><textarea name="fexp" rows="6"  style="width:398px;height: 65px;"></textarea></td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div id="productprint">
+<iframe id="productiframe" style="width: 100%; border: 0px;height: 100%;align:center" >
+	
+</iframe>
+</div>
+
+<!-- 打印弹出框菜单栏 -->
+<div class="menutb">
+	<a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.file'">文件</a>
+   
+    <a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.setting'">设置</a>
+	
+	<div class="file" style="width:150px;">
+	    <div>保存到PDF</div>
+	    <div>打印</div>
+	</div>
+	
+	<div class="setting" style="width:150px;">
+	    <div>显示制表时间</div>
+	    <div>不显示制表时间</div>
+	</div>
+</div>
+	<script>
+	/* 打印窗口 */
+	function openPrint(){
+		openPrintdl('商品类别','#productdg','#productprint','#productiframe');//该方法在print.js中
+	}
+	
+		$('#productdg').datagrid({
+			title:'全部商品列表',
+			url:'../product/init',//数据源
+			rownumbers:true,
+			singleSelect:true,
+			autoRowHeight:false,
+			pageSize:10,  
+			striped:true,       
+			pagination:true,
+			toolbar:'#producttb',
+			fitColumns:true,
+			fit:true,
+			columns:[[
+				{field:'code',title:'商品编号',width:100,sortable:true},
+				{field:'name',title:'商品名称',width:180,sortable:true},
+				{field:'mode',title:'商品型号',width:180,sortable:true},
+				{field:'statusname',title:'商品状态',width:180,sortable:true},
+				{field:'typename',title:'商品类型名称',width:180,sortable:true},
+				{field:'u_name',title:'操作员名称',width:180,sortable:true},
+				{field:'fexp',title:'商品备注',width:180,sortable:true}
+			]],
+			onDblClickRow:function (rowIndex,rowData){
+				openEdit();
+			}
+		});
+	/* 打开新增窗口 */
+	function openAdd(){
+		$('#product_form').form('clear');
+		$('#product_dialog').dialog({
+			closed: false,
+			modal:true,
+            title: "新增",
+            top:40,
+            left:280,
+            buttons: [{
+                text: '确定',
+                iconCls: 'icon-ok',
+                handler: add
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#product_dialog').dialog('close');                    
+                }
+            }]
+        });
+	}
+	/**
+	* Name 添加记录
+	*/
+	function add(){
+		$('#product_form').form('submit', {
+			url:'../product/insert',
+			success:function(data){
+				if(data){
+					/* $.messager.alert('信息提示','提交成功！','info'); */
+					$('#product_dialog').dialog('close');
+					$('#productdg').datagrid('reload',{
+					});
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	/**
+	* Name 打开修改窗口
+	*/
+	function openEdit(){
+		$('#product_form').form('clear');
+		var item = $('#productdg').datagrid('getSelected');
+		if(item){
+			$('#product_form').form('load',item);
+			$('#product_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#product_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+		}else{
+			$.messager.confirm('信息提示','请选择需要修改的行', function(result){});
+		}
+	}
+	/**
+	* Name 修改记录
+	*/
+	function edit(){
+		var item = $('#productdg').datagrid('getSelected');
+		$('#product_form').form('submit', {
+			url:'../product/update?id='+item.id,
+			success:function(data){
+				if(data){
+					$.messager.alert('信息提示','提交成功！','info');
+					$('#product_dialog').dialog('close');
+					$('#productdg').datagrid('reload',{
+								});	
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	
+	/**
+	* Name 删除记录
+	*/
+	function remove1(){
+		var item = $('#productdg').datagrid('getSelected');
+		if(item){
+			$.messager.confirm('信息提示','确定要删除该记录？', function(result){
+				if(result){
+					var items = $('#productdg').datagrid('getSelections');
+					var ids = [];
+					$(items).each(function(){
+						ids.push(this.id);	
+					});
+					//alert(ids);return; 
+					$.ajax({
+						url:'../product/del?ids='+ids,
+						success:function(data){
+							if(data){
+								$.messager.alert('信息提示','删除成功！','info');	
+								$('#productdg').datagrid('reload',{
+									});	
+							}
+							else
+							{
+								$.messager.alert('信息提示','删除失败！','info');		
+							}
+						}	
+					});
+				}	
+			});
+		}else{
+			$.messager.confirm('信息提示','请选择需要删除的行', function(result){});
+		}
+	}
+	/* 批量按钮 */
+	function batchop(o){
+		if($(o).attr("isopen")==0){
+			$(o).text("关闭批量删除");
+			$(o).attr("isopen","1");
+			$('#productdg').datagrid({
+				singleSelect:false,
+			});
+		
+		}else{
+			$(o).text("打开批量删除");
+			$(o).attr("isopen","0");
+			$('#productdg').datagrid({
+				singleSelect:true,
+			});
+		}
+	}
+	/* 打开自定义查询器 */
+	function openSearch(){
+		$('#product_form').form('clear');
+		$('#product_form').form('load',item);
+		$('#product_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#product_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+	}
+	</script>
+</body>
+</html>

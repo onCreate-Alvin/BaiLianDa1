@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="百莲达管理系统"
+  id="myeclipse.1503565324476"
+  context-root="/bld"
+  j2ee-spec="5.0"
+  archive="百莲达管理系统.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

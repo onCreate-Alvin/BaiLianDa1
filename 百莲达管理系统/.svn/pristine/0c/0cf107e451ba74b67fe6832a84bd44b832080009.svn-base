@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="../uimaker/easyui.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/icon.css" />
+<link rel="stylesheet" type="text/css" href="../uimaker/panel.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/linkbutton.css">
+
+<script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../easyui/1.5.3/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../js/print.js"></script>
+<script type="text/javascript" src="../SeachFramework/seach.js"></script>
+</head>
+<body >
+    <!-- Begin of toolbar -->
+    <div id="ordertb">
+       <a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="openAdd()" plain="true">添加</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-edit" onclick="openEdit()" plain="true">修改</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove1()" plain="true">删除</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-reload" onclick="reload()" plain="true">刷新</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-print" onclick="openPrint()" plain="true">打印</a>
+       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="allseach('order_search');">自定义查询</a>
+       <a href="javascript:void(0)" isopen="0" onclick="batchop(this)"  class="easyui-linkbutton" >打开批量处理</a>
+    </div>
+    <!-- End of toolbar -->
+    <table id="orderdg" class="easyui-datagrid"></table>
+
+<!-- Begin of easyui-dialog -->
+<div id="order_dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:400px; padding:10px;">
+	<form id="order_form" method="post">
+        <table>
+            <tr>
+                <td width="60" align="right">商品类别:</td>
+                <td><input type="text" name="name" style="width:260px" class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+           
+            <tr>
+                <td valign="top" align="right">备注:</td>
+                <td><textarea name="fexp" rows="6"  style="width:258px;height: 65px;"></textarea></td>
+            </tr>
+        </table>
+    </form>
+</div>
+<div id="orderprint">
+<iframe id="orderiframe" style="width: 100%; border: 0px;height: 100%;align:center" >
+	
+</iframe>
+</div>
+
+<!-- 打印弹出框菜单栏 -->
+<div class="menutb">
+	<a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.file'">文件</a>
+    
+    <a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.setting'">设置</a>
+	<div class="file" style="width:150px;">
+	    <div class="menu-sep">11</div>
+	    <div>保存到PDF</div>
+	    <div>打印</div>
+	    <div class="menu-sep"></div>
+	</div>
+	
+	<div class="setting" style="width:150px;">
+	    <div>显示制表时间</div>
+	    <div>不显示制表时间</div>
+	</div>
+</div>
+
+<div id="ordersearch"></div>
+	<script type="text/javascript">
+    function allseach(name) {
+    	//name 为资源文件
+		
+		$('#ordersearch').dialog({
+			closed: false,
+			modal:true,
+            title: "自定义查询",
+            top:0,
+            left:280,
+            href:"../allsearch?name=all&cmd="+name,
+            width:550,
+            height:400,
+            buttons: [{
+                text: '清空',
+                iconCls: 'icon-reload',
+                handler:clearbt
+            }, {
+                text: '添加',
+                iconCls: 'icon-add',
+                handler:addbt
+            }, {
+                text: '查询',
+                iconCls: 'icon-ok',
+                handler:seachbt
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#ordersearch').dialog('close');                    
+                }
+            }
+            ]
+        });
+	}
+	function seachbt() {
+			/* 将生成的查询条件放入obj */
+			var obj = {};
+			
+			for ( var i = 0; i < $("li").size(); i++) {
+				var li = $($("li").get(i));
+				obj["col" + i] = li.children(".opt").attr("col");
+				obj["type" + i] = li.children(".opt").attr("type");
+				obj["math" + i] = li.children(".math").val();
+				obj["andor" + i] = li.children(".andor").val();
+				obj["value" + i] = li.find(".i" + i).val();
+				obj["valuea" + i] = li.find(".ia" + i).val();
+			}
+			$.getJSON("../allsearch?name=sql&count="+$("li").size(), obj, function(json) {
+				$('#ordersearch').dialog('close');     
+				//数据刷新
+				$('#orderdg').datagrid('load',{
+					where:" where "+json.sql
+				});
+				$('#orderdg').datagrid('reload',{
+					where:" where "+json.sql
+				});
+				
+			});
+		}
+
+		function clearbt() {
+			$(".seach").empty();
+			addbt();
+		}
+		function addbt() {
+			my.additem();
+		}
+    </script>
+	<script>
+	/* 打印窗口 */
+	function openPrint(){
+		openPrintdl('商品类别','#orderdg','#orderprint','#orderiframe');//该方法在print.js中
+	}
+	
+		$('#orderdg').datagrid({
+			title:'全部单据',
+			url:'../ordermain/init',//数据源
+			rownumbers:true,
+			singleSelect:true,
+			autoRowHeight:false,
+			pageSize:10,  
+			striped:true,       
+			pagination:true,
+			toolbar:'#ordertb',
+			fitColumns:true,
+			fit:true,
+			columns:[[
+				{field:'ordercode',title:'单据编号',width:75,sortable:true},
+				{field:'ordertypename',title:'单据类型',width:75,sortable:true},
+				{field:'orderdate',title:'单据日期',width:75,sortable:true},
+				{field:'amount',title:'总金额',width:75,sortable:true},
+				{field:'vipamount',title:'会员卡支付',width:75,sortable:true},
+				{field:'point',title:'总积分',width:75,sortable:true},
+				{field:'clientname',title:'供应商名称',width:75,sortable:true},
+				{field:'vipname',title:'会员名称',width:75,sortable:true},
+				{field:'shopname',title:'分店名称',width:75,sortable:true},
+				{field:'destshopname',title:'目标分店名称',width:75,sortable:true},
+				{field:'statusname',title:'单据状态',width:75,sortable:true},
+				{field:'username',title:'操作员',width:75,sortable:true},
+				{field:'fexp',title:'备注',width:75,sortable:true},
+			]],
+			onDblClickRow:function (rowIndex,rowData){
+				openEdit();
+			}
+		});
+	/* 打开新增窗口 */
+	function openAdd(){
+		$('#order_form').form('clear');
+		$('#order_dialog').dialog({
+			closed: false,
+			modal:true,
+            title: "新增",
+            top:40,
+            left:280,
+            buttons: [{
+                text: '确定',
+                iconCls: 'icon-ok',
+                handler: add
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#order_dialog').dialog('close');                    
+                }
+            }]
+        });
+	}
+	/**
+	* Name 添加记录
+	*/
+	function add(){
+		$('#order_form').form('submit', {
+			url:'../order/insert',
+			success:function(data){
+				if(data){
+					/* $.messager.alert('信息提示','提交成功！','info'); */
+					$('#order_dialog').dialog('close');
+					$('#orderdg').datagrid('reload',{
+					});
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	/**
+	* Name 打开修改窗口
+	*/
+	function openEdit(){
+		$('#order_form').form('clear');
+		var item = $('#orderdg').datagrid('getSelected');
+		if(item){
+			$('#order_form').form('load',item);
+			$('#order_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#order_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+		}else{
+			$.messager.confirm('信息提示','请选择需要修改的行', function(result){});
+		}
+	}
+	/**
+	* Name 修改记录
+	*/
+	function edit(){
+		var item = $('#orderdg').datagrid('getSelected');
+		$('#order_form').form('submit', {
+			url:'../order/update?id='+item.id,
+			success:function(data){
+				if(data){
+					$.messager.alert('信息提示','提交成功！','info');
+					$('#order_dialog').dialog('close');
+					$('#orderdg').datagrid('reload',{
+								});	
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	
+	/**
+	* Name 删除记录
+	*/
+	function remove1(){
+		var item = $('#orderdg').datagrid('getSelected');
+		if(item){
+			$.messager.confirm('信息提示','确定要删除该记录？', function(result){
+				if(result){
+					var items = $('#orderdg').datagrid('getSelections');
+					var ids = [];
+					$(items).each(function(){
+						ids.push(this.id);	
+					});
+					//alert(ids);return; 
+					$.ajax({
+						url:'../order/del?ids='+ids,
+						success:function(data){
+							if(data){
+								$.messager.alert('信息提示','删除成功！','info');	
+								$('#orderdg').datagrid('reload',{
+									});	
+							}
+							else
+							{
+								$.messager.alert('信息提示','删除失败！','info');		
+							}
+						}	
+					});
+				}	
+			});
+		}else{
+			$.messager.confirm('信息提示','请选择需要删除的行', function(result){});
+		}
+	}
+	/* 批量按钮 */
+	function batchop(o){
+		if($(o).attr("isopen")==0){
+			$(o).text("关闭批量删除");
+			$(o).attr("isopen","1");
+			$('#orderdg').datagrid({
+				singleSelect:false,
+			});
+		
+		}else{
+			$(o).text("打开批量删除");
+			$(o).attr("isopen","0");
+			$('#orderdg').datagrid({
+				singleSelect:true,
+			});
+		}
+	}
+	/* 打开自定义查询器 */
+	function openSearch(){
+		$('#order_form').form('clear');
+		$('#order_form').form('load',item);
+		$('#order_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#order_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+	}
+	</script>
+</body>
+</html>

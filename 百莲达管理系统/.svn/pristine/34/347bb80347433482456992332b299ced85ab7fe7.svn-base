@@ -1,0 +1,60 @@
+package controller;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import service.BasicService;
+import utils.Jsondata;
+import utils.Jsonstatus;
+import utils.batchids;
+import utils.pagemanage;
+
+public class Basic_controller<T>{
+	private BasicService<T> getService(){
+		try {
+			Field f = getClass().getDeclaredField("service");
+			f.setAccessible(true);
+			return (BasicService) f.get(this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		return null;
+	}
+	private String getTypename(){
+		ParameterizedType type = (ParameterizedType) this.getClass().getGenericSuperclass();
+		Class cls = (Class)type.getActualTypeArguments()[0];
+		return cls.getSimpleName();
+	}
+	@RequestMapping("init")
+	public @ResponseBody Jsondata getall(pagemanage info,HttpServletRequest req) {
+		if(info.getSort()!=null)info.setSort(getTypename()+"."+info.getSort());
+		List rs = getService().getall(info);
+		long count = getService().getAllSize(info);
+		return new Jsondata(rs,(int)count);
+	}
+	@RequestMapping("del")
+	public @ResponseBody Jsonstatus del(batchids ids,HttpServletRequest req) {
+		System.out.println(ids.getIds());
+		getService().del(ids);
+		return new Jsonstatus(1);
+	}
+	@RequestMapping("update")
+	public   @ResponseBody Jsonstatus update(HttpServletRequest req,T b){
+		getService().update(b);
+		return new Jsonstatus(1);
+	}
+	@RequestMapping("insert")
+	public   @ResponseBody Jsonstatus insert(HttpServletRequest req,T b){
+		getService().insert(b);
+		return new Jsonstatus(1);
+	}
+	
+}

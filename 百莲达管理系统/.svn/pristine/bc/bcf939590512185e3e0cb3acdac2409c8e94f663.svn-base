@@ -1,0 +1,110 @@
+package model;
+
+public class order {
+	int id;
+	String ordercode;
+	int ordertype;
+	String orderdate;
+	String createdate;
+	double amount;
+	double vipamount=0;
+	
+	public double getVipamount() {
+		return vipamount;
+	}
+	public void setVipamount(double vipamount) {
+		this.vipamount = vipamount;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getOrdercode() {
+		return ordercode;
+	}
+	public void setOrdercode(String ordercode) {
+		this.ordercode = ordercode;
+	}
+	public int getOrdertype() {
+		return ordertype;
+	}
+	public void setOrdertype(int ordertype) {
+		this.ordertype = ordertype;
+	}
+	public String getOrderdate() {
+		return orderdate;
+	}
+	public void setOrderdate(String orderdate) {
+		this.orderdate = orderdate;
+	}
+	public String getCreatedate() {
+		return createdate;
+	}
+	public void setCreatedate(String createdate) {
+		this.createdate = createdate;
+	}
+	public double getAmount() {
+		return amount;
+	}
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
+	public double getPoint() {
+		return point;
+	}
+	public void setPoint(double point) {
+		this.point = point;
+	}
+	public int getVipid() {
+		return vipid;
+	}
+	public void setVipid(int vipid) {
+		this.vipid = vipid;
+	}
+	public int getShopid() {
+		return shopid;
+	}
+	public void setShopid(int shopid) {
+		this.shopid = shopid;
+	}
+	public int getUserid() {
+		return userid;
+	}
+	public void setUserid(int userid) {
+		this.userid = userid;
+	}
+	public int getClientid() {
+		return clientid;
+	}
+	public void setClientid(int clientid) {
+		this.clientid = clientid;
+	}
+	public int getDestshopid() {
+		return destshopid;
+	}
+	public void setDestshopid(int destshopid) {
+		this.destshopid = destshopid;
+	}
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	public String getExp() {
+		return exp;
+	}
+	public void setExp(String exp) {
+		this.exp = exp;
+	}
+	double point;
+	int vipid;
+	int shopid;
+	int userid;
+	int clientid;
+	int destshopid;
+	int status;
+	String exp;
+}

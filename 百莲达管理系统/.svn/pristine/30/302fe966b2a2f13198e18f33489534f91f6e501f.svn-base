@@ -1,0 +1,7 @@
+package service;
+
+import model.product;
+
+public interface product_service extends BasicService<product>{
+
+}

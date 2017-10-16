@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:mvc="http://www.springframework.org/schema/mvc"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:context="http://www.springframework.org/schema/context"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd
+">
+<mvc:annotation-driven/>
+<!-- 数据源 -->
+ <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+							 destroy-method="close">  
+        	<property name="driverClassName" value="com.mysql.jdbc.Driver" />  
+        	<property name="url" value="jdbc:mysql://127.0.0.1:3306/bld?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true" />  
+        	<property name="username" value="root" />  
+        	<property name="password" value="123" />  
+ </bean>  
+      <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+        			<property name="dataSource" ref="dataSource" /> 
+    </bean>
+    			<!--自动加载mapper，就是所谓的dao,给每一个mapper注入信息  -->  
+      <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
+        	<property name="basePackage" value="mapper" />  
+    </bean> 
+<context:component-scan base-package="mapper"></context:component-scan>
+<context:component-scan base-package="serviceImpl"></context:component-scan>
+
+ <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" > 
+    <property name="messageConverters"> 
+  <list> 
+   <ref bean="mappingJacksonHttpMessageConverter" />
+  </list> 
+</property> 
+</bean>   
+<bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" /> 
+
+ <!--文件上传bean  -->
+ <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+ 	<!--文件上传定制设置  -->
+ 	<property name="defaultEncoding" value="utf-8"></property>
+ 	<property name="maxUploadSize" value="500000000"></property>
+ </bean>  
+
+	<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />
+	<bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/"/>
+		<property name="suffix" value=".jsp" />
+	</bean>
+<context:component-scan base-package="controller"></context:component-scan>
+<context:component-scan base-package="serviceImpl"></context:component-scan>
+<context:component-scan base-package="mapper"></context:component-scan>
+<!-- <bean class="controller.test"></bean> -->
+<mvc:resources location="img/*" mapping="img/*"/><!-- 实际位置+逻辑地址 ，资源文件，不拦截-->
+<mvc:resources location="css/*" mapping="css/*"/>
+<mvc:resources location="js/*" mapping="js/*"/>
+</beans>

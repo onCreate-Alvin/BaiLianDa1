@@ -1,0 +1,12 @@
+"data":[
+{"tablename":"client","colname":"code","type":2,"lable":"供应商编号"},
+{"tablename":"client","colname":"name","type":2,"lable":"供应商姓名"},
+{"tablename":"client","colname":"addr","type":2,"lable":"供应商地址"},
+{"tablename":"client","colname":"lxr","type":2,"lable":"联系人"},
+{"tablename":"client","colname":"sex","type":6,"url":"../AllSeach/Array?name=sexnames","lable":"性别"},
+{"tablename":"client","colname":"tel","type":2,"lable":"电话"},
+{"tablename":"client","colname":"telmov","type":2,"lable":"手机"},
+{"tablename":"client","colname":"createdate","type":2,"lable":"创建时间"},
+{"tablename":"client","colname":"userid","type":5,"url":"../AllSeach/user","lable":"创建人"},
+{"tablename":"client","colname":"comments","type":2,"lable":"客户备注"}
+]

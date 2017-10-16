@@ -1,0 +1,17 @@
+"data":[
+{"tablename":"user","colname":"code","type":2,"lable":"操作员编号"},
+{"tablename":"user","colname":"name","type":2,"lable":"操作员姓名"},
+{"tablename":"user","colname":"addr","type":2,"lable":"操作员住址"},
+{"tablename":"user","colname":"sex","type":6,"url":"../AllSeach/Array?name=sexnames","lable":"性别"},
+{"tablename":"user","colname":"tel","type":2,"lable":"电话"},
+{"tablename":"user","colname":"telmov","type":2,"lable":"手机"},
+{"tablename":"user","colname":"birthdate","type":3,"lable":"生日"},
+{"tablename":"user","colname":"ccode","type":2,"lable":"身份证号码"},
+{"tablename":"user","colname":"createdate","type":3,"lable":"创建时间"},
+{"tablename":"user","colname":"enterdate","type":3,"lable":"入职时间"},
+{"tablename":"user","colname":"exitdate","type":3,"lable":"离职时间"},
+{"tablename":"user","colname":"status","type":6,"url":"../AllSeach/Array?name=operatorstatus","lable":"操作员状态"},
+{"tablename":"user","colname":"shopid","type":5,"url":"../AllSeach/shop","lable":"所属分店"},
+{"tablename":"user","colname":"userid","type":5,"url":"../AllSeach/user","lable":"创建人"},
+{"tablename":"user","colname":"fexp","type":2,"lable":"备注"}
+]

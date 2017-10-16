@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="../uimaker/easyui.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/icon.css" />
+<link rel="stylesheet" type="text/css" href="../uimaker/panel.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/linkbutton.css">
+
+<script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../easyui/1.5.3/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../js/print.js"></script>
+</head>
+<body >
+    <!-- Begin of toolbar -->
+    <div id="viptb">
+       <a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="openAdd()" plain="true">添加</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-edit" onclick="openEdit()" plain="true">修改</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove1()" plain="true">删除</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-reload" onclick="reload()" plain="true">刷新</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-print" onclick="openPrint()" plain="true">打印</a>
+       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="openSearch()">查询</a>
+       <a href="javascript:void(0)" isopen="0" onclick="batchop(this)"  class="easyui-linkbutton" >打开批量处理</a>
+    </div>
+    <!-- End of toolbar -->
+    <table id="vipdg" class="easyui-datagrid"></table>
+
+<!-- Begin of easyui-dialog -->
+<div id="vip_dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:550px; padding:10px;">
+	<form id="vip_form" method="post">
+        <table>
+            <tr>
+                <td width="80" align="right">会员编号:</td>
+                <td><input type="text" name="code"  class="easyui-validatebox"  data-options="required:true"/></td>
+            	<td width="80" align="right">会员姓名:</td>
+                <td><input type="text" name="name" class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+            <tr>
+                <td width="80" align="right">会员级别:</td>
+                <td><input type="text"  class="easyui-combobox" name="status"  data-options="required:true,editable:false,valueField:'0',textField:'1',url:'viplevel'"></td>
+            	<td width="80" align="right">会员类型:</td>
+                <td><input type="text"  class="easyui-combobox" name="viptypeid"  data-options=" required:true,editable:false,valueField:'id',textField:'name',url:'viptypelist'"></td>
+            </tr>
+            <tr>
+                <td width="80" align="right">性别:</td>
+                 <td><input type="text"  class="easyui-combobox" name="sex"  data-options="required:true,editable:false,valueField:'0',textField:'1',url:'sexlist'"></td>
+            	<td width="80" align="right">固定电话:</td>
+                <td><input type="text" name="tel"  class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+             <tr>
+                <td width="80" align="right">所在店:</td>
+                 <td><input type="text"  class="easyui-combobox" name="shopid"  data-options=" required:true,editable:false,valueField:'id',textField:'name',url:'shoplist'"></td>
+            	<td width="80" align="right">介绍人:</td>
+                <td><input type="text" name="jsr"  class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+             <tr>
+                <td width="80" align="right">手机号:</td>
+                <td><input type="number" maxlength="11" name="telmov"  class="easyui-validatebox"  data-options="required:true,validType:'phoneNum'"/></td>
+            	<td width="80" align="right">积分数:</td>
+                <td><input style="text-align:right;color:red" type="text"  class="easyui-validatebox"  data-options="required:false,editable:false" name="point" value="0"/></td>
+            </tr>
+             <tr>
+                <td width="80" align="right">存款数:</td>
+                <td><input style="text-align:right;color:red" type="text" class="easyui-validatebox"   data-options="required:false,editable:false"  name="amount" value="0"/></td>
+            	<td width="80" align="right">生日日期:</td>
+                <td><input type="text" name="birthdate" class="easyui-datebox"  data-options="editable:false,required:true"/></td>
+            </tr>
+             <tr>
+                <td width="80" align="right">身份证号码:</td>
+                <td colspan="3"><input style="width:408px" type="text" name="ccode" class="easyui-validatebox"  data-options="required:true,validType:'idcared'"/></td>
+            	
+             <tr>
+            	<td width="80" align="right">家庭住址:</td>
+                <td colspan="3"><input  style="width: 408px" type="text" name="addr"  class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+            
+            
+            <tr>
+                <td width="80" align="right">备注:</td>
+                <td colspan="3"><textarea  name ="fexp" rows="3" style="width: 406px;height: 65px;resize: none;"></textarea></td>
+            </tr>
+        </table>
+    </form>
+</div>
+<div id="vipprint">
+<iframe id="vipiframe" style="width: 100%; border: 0px;height: 100%;align:center" >
+	
+</iframe>
+</div>
+
+<!-- 打印弹出框菜单栏 -->
+<div class="menutb">
+	<a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.file'">文件</a>
+   
+    <a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.setting'">设置</a>
+	<div class="file" style="width:150px;">
+	    <div class="menu-sep">11</div>
+	    <div>保存到PDF</div>
+	    <div>打印</div>
+	    <div class="menu-sep"></div>
+	</div>
+	
+	<div class="setting" style="width:150px;">
+	    <div>显示制表时间</div>
+	    <div>不显示制表时间</div>
+	</div>
+</div>
+	<script>
+	/* 打印窗口 */
+	function openPrint(){
+		openPrintdl('商品类别','#vipdg','#vipprint','#vipiframe');//该方法在print.js中
+	}
+	
+		$('#vipdg').datagrid({
+			title:'全部供货商列表',
+			url:'init',//数据源
+			rownumbers:true,
+			singleSelect:true,
+			autoRowHeight:false,
+			pageSize:10,  
+			striped:true,       
+			pagination:true,
+			toolbar:'#viptb',
+			fitColumns:true,
+			fit:true,
+			columns:[[
+				{field:'code',title:'会员编号',width:100,sortable:true},
+				{ field:'name',title:'会员名称',width:180,sortable:true},
+				{ field:'sexname',title:'会员 性别',width:100,sortable:true},
+				{ field:'addr',title:'会员地址',width:100,sortable:true},
+				{ field:'tel',title:'会员电话',width:100,sortable:true},
+				{ field:'telmov',title:'会员手机',width:100,sortable:true},
+				{ field:'birthdate',title:'会员出生日期',width:100,sortable:true},
+				{ field:'amount',title:'会员余额',width:100,sortable:true},
+				{ field:'point',title:'会员积分',width:100,sortable:true},
+				{ field:'u_name',title:'操作员名称',width:100,sortable:true},
+				{ field:'s_name',title:'分店名字',width:100,sortable:true},
+				{ field:'fexp',title:'会员备注',width:100,sortable:true}
+			]],
+			onDblClickRow:function (rowIndex,rowData){
+				openEdit();
+			}
+		});
+	/* 打开新增窗口 */
+	function openAdd(){
+		$('#vip_form').form('clear');
+		$('[name=point]').val("0");
+		$('[name=amount]').val("0");
+		$('#vip_dialog').dialog({
+			closed: false,
+			modal:true,
+            title: "新增",
+            top:0,
+            left:280,
+            buttons: [{
+                text: '确定',
+                iconCls: 'icon-ok',
+                handler: add
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#vip_dialog').dialog('close');                    
+                }
+            }]
+        });
+	}
+	/**
+	* Name 添加记录
+	*/
+	function add(){
+		$('#vip_form').form('submit', {
+			url:'insert',
+			success:function(data){
+				if(data){
+					/* $.messager.alert('信息提示','提交成功！','info'); */
+					$('#vip_dialog').dialog('close');
+					$('#vipdg').datagrid('reload',{
+					});
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	/**
+	* Name 打开修改窗口
+	*/
+	function openEdit(){
+		$('#vip_form').form('clear');
+		var item = $('#vipdg').datagrid('getSelected');
+		if(item){
+			$('#vip_form').form('load',item);
+			$('#vip_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#vip_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+		}else{
+			$.messager.confirm('信息提示','请选择需要修改的行', function(result){});
+		}
+	}
+	/**
+	* Name 修改记录
+	*/
+	function edit(){
+		var item = $('#vipdg').datagrid('getSelected');
+		$('#vip_form').form('submit', {
+			url:'update?id='+item.id,
+			success:function(data){
+				if(data){
+					$.messager.alert('信息提示','提交成功！','info');
+					$('#vip_dialog').dialog('close');
+					$('#vipdg').datagrid('reload',{
+								});	
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	
+	/**
+	* Name 删除记录
+	*/
+	function remove1(){
+		var item = $('#vipdg').datagrid('getSelected');
+		if(item){
+			$.messager.confirm('信息提示','确定要删除该记录？', function(result){
+				if(result){
+					var items = $('#vipdg').datagrid('getSelections');
+					var ids = [];
+					$(items).each(function(){
+						ids.push(this.id);	
+					});
+					//alert(ids);return; 
+					$.ajax({
+						url:'del?ids='+ids,
+						success:function(data){
+							if(data){
+								$.messager.alert('信息提示','删除成功！','info');	
+								$('#vipdg').datagrid('reload',{
+									});	
+							}
+							else
+							{
+								$.messager.alert('信息提示','删除失败！','info');		
+							}
+						}	
+					});
+				}	
+			});
+		}else{
+			$.messager.confirm('信息提示','请选择需要删除的行', function(result){});
+		}
+	}
+	/* 批量按钮 */
+	function batchop(o){
+		if($(o).attr("isopen")==0){
+			$(o).text("关闭批量删除");
+			$(o).attr("isopen","1");
+			$('#vipdg').datagrid({
+				singleSelect:false,
+			});
+		
+		}else{
+			$(o).text("打开批量删除");
+			$(o).attr("isopen","0");
+			$('#vipdg').datagrid({
+				singleSelect:true,
+			});
+		}
+	}
+	/* 打开自定义查询器 */
+	function openSearch(){
+		$('#vip_form').form('clear');
+		$('#vip_form').form('load',item);
+		$('#vip_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#vip_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+	}
+	
+	</script>
+	<script type="text/javascript" src="../js/yanzheng.js"></script>
+</body>
+</html>

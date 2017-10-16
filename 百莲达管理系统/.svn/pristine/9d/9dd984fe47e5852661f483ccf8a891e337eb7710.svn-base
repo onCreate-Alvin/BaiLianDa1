@@ -1,0 +1,200 @@
+package situ.bld.util;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Properties;
+
+import situ.bld.dao.SqlHelper;
+
+public class dataimport {
+
+String stable="";
+String dtable="";	
+ArrayList<dcol> colinfs=new ArrayList<dcol>();
+public importdata_listenter listenter;
+public dataimport(String filename) {
+	Properties p = new Properties();
+	try {
+		p.load(new FileInputStream(filename));
+		setdata(p);
+	} catch (FileNotFoundException e) {
+		e.printStackTrace();
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+}
+public dataimport(Properties p) {
+	setdata(p);
+}
+private void  setdata(Properties p) {
+	String[] d_name=p.getProperty("d_name", "").split(",");
+	String[] dstype=p.getProperty("dstype", "").split(",");
+	String[] d_sname=p.getProperty("d_sname", "").split(",");
+	String[] d_type=p.getProperty("d_type", "").split(",");
+	String[] d_fj=p.getProperty("d_fj", "").split(",");
+	String[] d_idsql=p.getProperty("d_idsql", "").split(",");
+	String[] d_defvalue=p.getProperty("d_defvalue", "").split(",");
+	
+	String[] maps=p.getProperty("mapkeys", "").split(",");
+	stable=p.getProperty("stable", "");
+	 dtable=p.getProperty("dtable", "");
+	for(int i=0;i<d_name.length;i++){
+		dcol c1 = new dcol();
+		if(d_name.length>1) c1.name=d_name[i];
+		if(dstype.length>1)c1.datatype=Integer.valueOf(dstype[i]);
+		if(d_sname.length>i){
+			
+			if(maps.length>0&&maps.length>i&&maps[i].length()>0){
+				HashMap<Object, Object>keys = new HashMap<Object, Object>();
+				String[] s1=maps[i].split("!");
+				for(String s:s1){
+					String[] s2=s.split("~");
+					Object k=null;
+					Object v=null;
+					if(s2[0].equalsIgnoreCase("null")) k=null;
+					else if(s2[0].indexOf("'")==0)k=s2[0].replace("'","");
+					else k=Integer.valueOf(s2[0]);
+					
+					if(s2[1].indexOf("'")==0)v=s2[1].replace("'","");
+					else v=Integer.valueOf(s2[1]);
+					keys.put(k, v);
+				}
+				c1.mykeys=keys;
+			}
+			if(d_sname.length>1)c1.sname=d_sname[i];
+			if(d_type.length>1)c1.type=Integer.valueOf(d_type[i]);
+			if(d_fj.length>1)c1.fj=d_fj[i].replace("'", "");
+			if(d_idsql.length>1)c1.idsql=d_idsql[i].replace("'", "");;
+		}else{
+			if(d_defvalue[i].indexOf("'")==0){
+				c1.defvalue=d_defvalue[i].replace("'","");
+			}
+			else{
+				c1.defvalue=d_defvalue[i];
+			}
+		}
+		this.colinfs.add(c1);
+		}
+}
+String sql;
+
+public void del(){
+	SqlHelper.ExeSql("delete from "+dtable);
+}
+public void start(){
+	new Thread(new Runnable() {
+		public void run() {
+			try{
+			Object maxcount= SqlHelper.ExeSum("select count(*) from "+stable);
+			if(listenter!=null) listenter.msg(1, Integer.valueOf(maxcount.toString()),"");
+			}catch (Exception e) {
+				if(listenter!=null) listenter.msg(1, 0,"");
+				return;
+			}
+			
+			ResultSet rs= SqlHelper.ExeSelect("select * from "+stable );
+			try{
+				int num=0;
+			while(rs.next()){
+				num+=1;
+				
+				for(dcol c:colinfs){
+					c.sval=null;
+					if(c.sname.length()>0){
+						c.sval=rs.getObject(c.sname);
+					}
+				}
+				String colstr="";
+				String valstr="";
+		        for(dcol c:colinfs){
+					colstr+=c.name+",";
+					Object v = null;
+					switch (c.type) {
+					case 0:
+						if(c.sname.length()==0){
+							v=c.defvalue;
+						}else{
+						v=c.sval;
+						}
+						break;
+					case 6:
+						if(c.sval==null)v="";
+						else v=c.sval;
+						break;
+					case 4:
+						v=c.fj+num ;
+						break;
+					case 5:
+						v=c.mykeys.get(c.sval) ;
+						break;
+					case 7:
+						try{
+						Date d = new Date(c.sval.toString().replace("年", "/").replace("月", "/").replace("日", ""));
+						v=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d);
+						}catch (Exception e) {
+							v="";
+						}
+						break;
+					case 1:
+						ResultSet dr=SqlHelper.ExeSelect(c.idsql+"'"+c.sval.toString()+"'");
+						try{
+						if(dr.next()){
+							v=dr.getObject(1);
+						}
+						dr.close();
+						}catch (Exception e) {
+							e.printStackTrace();
+							v=0;
+						}
+						break;
+					}
+					
+					if(c.datatype==0){
+						if(v==null){
+							valstr+="'',";
+						}else{
+						valstr+="'"+v.toString()+"',";
+						}
+					}else{
+				    	valstr+=v.toString()+",";
+					}
+				}
+				colstr=colstr.substring(0,colstr.length()-1);
+				valstr=valstr.substring(0,valstr.length()-1);
+				sql="insert into "+dtable +"("+colstr+") values("+valstr+") ";
+				int pos=SqlHelper.ExeSql(sql);
+				//System.out.println(pos + " --  "+sql);
+				if(listenter!=null) listenter.msg(2, num,sql);
+			}
+			rs.close();
+			}catch (Exception e) {
+				e.printStackTrace();
+				if(listenter!=null) listenter.msg(2, 0,sql);
+			}
+			if(listenter!=null) listenter.msg(3, 0,"");
+		}
+	}).start();
+	
+}
+}
+class dcol{
+	String name="";
+	String sname="";
+	Object defvalue="";
+	int type=0;//0 直接  1 id模式 2列合并 3  4附带加入序号 5根据键值,6不为空,7日期转换
+	int datatype=0;// 0字符 1数字
+	String idsql="";//1
+	String coljg="";//2 连接符
+	String sname1="";//2 
+	String fj="";//4
+	HashMap<Object, Object> mykeys=new HashMap<Object, Object>(); //5
+	Object sval=null;
+	
+}

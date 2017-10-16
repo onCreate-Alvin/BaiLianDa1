@@ -1,0 +1,22 @@
+package mapper;
+
+import java.util.List;
+
+import model.client;
+
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Repository;
+
+import utils.pagemanage;
+
+@Repository("client_Mapper")//描述mapper，数据库，作用给当前的bean加入一个名字，方便其他位置使用
+public interface client_Mapper extends Basic_mapper<client> {
+	
+
+	
+	
+
+}

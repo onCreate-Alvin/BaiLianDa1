@@ -1,0 +1,129 @@
+package utils;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+
+public class Import_Form extends JDialog implements ActionListener{
+
+	dataimport dim;
+	JButton bt1=new JButton("选择路径");
+	JButton bt2=new JButton("开始导入");
+	JLabel	la1=new JLabel("配置文件:");
+	JTextField jt=new JTextField("请选择导入数据的配置文件路径...");
+	JLabel suml = new JLabel("0");
+	JLabel currl = new JLabel("0");
+	
+	JTextArea jta=new JTextArea();
+	
+	public Import_Form(Component c) {
+		setTitle("数据导入");
+		setSize(500, 400);
+		setLocationRelativeTo(c);
+		setLayout(null);
+		setResizable(false);
+		bt1.setBounds(355, 20, 100, 30);
+		bt2.setBounds(360, 325, 100, 30);
+		la1.setBounds(30, 20, 60, 30);
+		jt.setBounds(100, 20, 250, 30);
+		jt.setFocusable(false);
+		JLabel jl1 = new JLabel("总记录数");
+		JLabel jl2 = new JLabel("当前记录");
+		jl1.setBounds(30, 50, 60, 30);
+		suml.setBounds(100, 50, 60, 30);
+		jl2.setBounds(170, 50, 60, 30);
+		currl.setBounds(240, 50, 60, 30);
+		add(jl1);
+		add(jl2);
+		add(suml);
+		add(currl);
+		JPanel p = new JPanel();
+		p.setBounds(30, 80, 430, 240);
+		p.setBackground(Color.red);
+		p.setLayout(new GridLayout(1, 1));
+		add(bt1);
+		add(bt2);
+		add(la1);
+		add(jt);
+	p.add(new JScrollPane( jta));
+		add(p);
+		bt1.addActionListener(this);
+		bt2.addActionListener(this);
+
+		setVisible(true);
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource().equals(bt1)){
+			JFileChooser f=new JFileChooser();
+			
+			f.setCurrentDirectory(new File(System.getProperty("user.dir")));
+			FileNameExtensionFilter dd=new FileNameExtensionFilter("配置文件", "Properties");
+			f.setFileFilter(dd);
+			f.showOpenDialog(null);
+			if(f.getSelectedFile()!=null){
+			String str = f.getSelectedFile().getName();
+			jt.setText(str);
+			}
+		}else{
+			String s=jt.getText();
+			if(s.length()==0)return ;
+			if(!s.contains(".Properties"))return;
+			bt1.setEnabled(false);
+			bt2.setEnabled(false);
+			dim=new dataimport(s);
+			dim.listenter=new importdata_listenter() {
+				public void msg(int bz, int count, String sql) {
+				if(bz==1){
+					if(count==0){
+						JOptionPane.showMessageDialog(null, "记录获取错误");
+						bt1.setEnabled(true);
+						bt2.setEnabled(true);
+						return;
+						}else{
+					suml.setText(String.valueOf(count));
+					}
+				}else if(bz==2){
+					if(count==0){						
+						if(JOptionPane.showConfirmDialog(null, "记录导入错误,是否清空已导入的数据？","完成信息",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+							dim.del();
+						}
+						bt1.setEnabled(true);
+						bt2.setEnabled(true);
+						return;
+					}else{
+					currl.setText(String.valueOf(count));
+					}
+					jta.append(sql+"\n");						
+				}else{
+					if(JOptionPane.showConfirmDialog(null, "记录导入完成,是否继续导入其他数据？","完成信息",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+						jta.setText("");
+						jt.setText("请选择导入数据的配置文件路径...");
+						bt1.setEnabled(true);
+						bt2.setEnabled(true);
+					}
+					}
+				}
+			};
+			dim.start();
+
+		}
+	}
+
+}

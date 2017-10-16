@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="../uimaker/easyui.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/icon.css" />
+<link rel="stylesheet" type="text/css" href="../uimaker/panel.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/linkbutton.css">
+
+<script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../easyui/1.5.3/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../js/print.js"></script>
+</head>
+<body >
+    <!-- Begin of toolbar -->
+    <div id="initstoretb" style="padding-left: 40px">
+      选择分店 <input type="text"  class="easyui-combobox" name="shopid"  data-options=" required:true,editable:false,valueField:'id',textField:'name',url:'../vip/shoplist'"/>
+    </div>
+    <!-- End of toolbar -->
+    <table id="initstoredg" class="easyui-datagrid"></table>
+
+<!-- Begin of easyui-dialog -->
+<div id="initstore_dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:300px; padding:10px;">
+	<form id="initstore_form" method="post">
+        <table>
+            <tr>
+                <td width="70" align="right">商品名称:</td>
+                <td><input type="text" name="productname" style="border: 0px" class="easyui-validatebox"  data-options="required:true,editable:false"/></td>
+            </tr>
+            <tr>
+                <td width="70" align="right">商品数量:</td>
+                <td><input type="text" name="count"  class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+            <tr>
+                <td width="70" align="right">商品成本:</td>
+                <td><input type="text" name="cbprice"  class="easyui-validatebox"  data-options="required:true"/></td>
+           	</tr>
+            <tr>
+            	<td width="70" align="right">参考单价:</td>
+                <td><input type="text" name="defprice"  class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+           
+        </table>
+    </form>
+</div>
+	<script>
+	$('#initstoredg').datagrid({
+			title:'全部商品类型',
+			url:'../store/getbyshopid?shopid=0',//数据源
+			rownumbers:true,
+			singleSelect:true,
+			autoRowHeight:false,
+			pageSize:10,  
+			striped:true,       
+			pagination:true,
+			toolbar:'#initstoretb',
+			fitColumns:true,
+			fit:true,
+			columns:[[
+				{field:'productcode',title:'商品编号',width:100,sortable:true},
+				{field:'productname',title:'商品名称',width:100,sortable:true},
+				{field:'statusname',title:'商品状态',width:100,sortable:true},
+				{field:'count',title:'库存数量',width:100,sortable:true},
+				{field:'defprice',title:'默认价格',width:100,sortable:true},
+				{field:'cbprice',title:'成本价格',width:100,sortable:true}
+			]],
+			onDblClickRow:function (rowIndex,rowData){
+				openEdit();
+			}
+		});
+	/**
+	* Name 打开修改窗口
+	*/
+	function openEdit(){
+		$('#initstore_form').form('clear');
+		var item = $('#initstoredg').datagrid('getSelected');
+		if(item){
+			$('#initstore_form').form('load',item);
+			$('#initstore_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            left:300,
+	            top:50,
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#initstore_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+		}else{
+			$.messager.confirm('信息提示','请选择需要修改的行', function(result){});
+		}
+	}
+	/**
+	* Name 修改记录
+	*/
+	function edit(){
+		var item = $('#initstoredg').datagrid('getSelected');
+		$('#initstore_form').form('submit', {
+			url:'../store/update?id='+item.id,
+			success:function(data){
+				if(data){
+					$.messager.alert('信息提示','提交成功！','info');
+					$('#initstore_dialog').dialog('close');
+					$('#initstoredg').datagrid('reload',{
+								});	
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	</script>
+	<!-- change事件 -->
+	<script type="text/javascript">
+    $("[name=shopid]").combobox({
+		onChange: function (newVal,oldVal) {
+			$('#initstoredg').datagrid('options').url = "../store/getbyshopid?shopid="+newVal;
+			$('#initstoredg').datagrid('reload');
+		}
+		});
+    </script>
+</body>
+</html>

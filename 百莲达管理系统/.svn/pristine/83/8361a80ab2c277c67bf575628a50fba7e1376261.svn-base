@@ -1,0 +1,18 @@
+package controller;
+
+
+import javax.annotation.Resource;
+
+import model.product;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import service.product_service;
+
+@Controller
+@RequestMapping("product")
+public class product_controller extends Basic_controller<product> {
+	@Resource(name="product_serviceImpl")
+	product_service service;
+}

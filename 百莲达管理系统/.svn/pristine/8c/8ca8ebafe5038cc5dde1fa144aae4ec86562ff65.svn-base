@@ -1,0 +1,15 @@
+"data":[
+{"tablename":"ordermain","colname":"ordercode","type":2,"lable":"单据编号"},
+{"tablename":"ordermain","colname":"ordertype","type":6,"url":"../AllSeach/Array?name=ordertypename","lable":"单据类型"},
+{"tablename":"ordermain","colname":"orderdate","type":3,"lable":"单据日期"},
+{"tablename":"ordermain","colname":"amount","type":1,"lable":"总金额"},
+{"tablename":"ordermain","colname":"vipamount","type":1,"lable":"会员卡支付"},
+{"tablename":"ordermain","colname":"point","type":1,"lable":"总积分"},
+{"tablename":"ordermain","colname":"clientid","type":5,"url":"../AllSeach/client","lable":"供应商名称"},
+{"tablename":"ordermain","colname":"vipid","type":5,"url":"../AllSeach/vip","lable":"会员名称"},
+{"tablename":"ordermain","colname":"shopid","type":5,"url":"../AllSeach/shop","lable":"分店名称"},
+{"tablename":"ordermain","colname":"destshopid","type":5,"url":"../AllSeach/shop","lable":"供应商名称"},
+{"tablename":"ordermain","colname":"status","type":6,"url":"../AllSeach/Array?name=orderstatus","lable":"单据状态"},
+{"tablename":"ordermain","colname":"userid","type":5,"url":"../AllSeach/user","lable":"操作员名称"},
+{"tablename":"ordermain","colname":"fexp","type":2,"lable":"备注"}
+]

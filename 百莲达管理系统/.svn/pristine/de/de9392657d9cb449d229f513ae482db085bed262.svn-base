@@ -1,0 +1,8 @@
+"data":[
+{"tablename":"Course","colname":"name","type":2,"lable":"课程名称"},
+{"tablename":"Course","colname":"description","type":2,"lable":"课程简介"},
+{"tablename":"Course","colname":"time","type":0,"lable":"课时"},
+{"tablename":"Course","colname":"status","type":6,"url":"AllSeach/Array?name=coursestatus","lable":"使用状态"}
+,
+{"tablename":"Course","colname":"comments","type":2,"lable":"备注"}
+]

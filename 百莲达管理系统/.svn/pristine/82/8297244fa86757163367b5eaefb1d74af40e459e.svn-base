@@ -1,0 +1,18 @@
+package controller;
+
+
+import javax.annotation.Resource;
+
+import model.client;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import service.client_service;
+
+@Controller
+@RequestMapping("client")
+public class client_controller extends Basic_controller<client> {
+	@Resource(name="client_serviceImpl")
+	client_service service;
+}

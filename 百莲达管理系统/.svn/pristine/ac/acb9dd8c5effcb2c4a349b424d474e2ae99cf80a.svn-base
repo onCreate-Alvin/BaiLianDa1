@@ -1,0 +1,41 @@
+package model;
+
+public class checkdetail {
+	//id checkcodE productiD	count	exP
+private	int id;
+private	int checkid;
+private	int productid;
+private	double count;
+private	String exp;
+public int getId() {
+	return id;
+}
+public void setId(int id) {
+	this.id = id;
+}
+public int getCheckid() {
+	return checkid;
+}
+public void setCheckid(int checkid) {
+	this.checkid = checkid;
+}
+public int getProductid() {
+	return productid;
+}
+public void setProductid(int productid) {
+	this.productid = productid;
+}
+public double getCount() {
+	return count;
+}
+public void setCount(double count) {
+	this.count = count;
+}
+public String getExp() {
+	return exp;
+}
+public void setExp(String exp) {
+	this.exp = exp;
+}
+
+}

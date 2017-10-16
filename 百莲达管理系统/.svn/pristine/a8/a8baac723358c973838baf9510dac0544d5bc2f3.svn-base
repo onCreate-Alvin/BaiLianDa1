@@ -1,0 +1,52 @@
+package controller;
+
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import model.ordermain;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import service.ordermain_service;
+import utils.Jsonstatus;
+import utils.autoCreate;
+
+@Controller
+@RequestMapping("ordermain")
+public class ordermain_controller extends Basic_controller<ordermain> {
+	@Resource(name="ordermain_serviceImpl")
+	ordermain_service service;
+	
+	@Override
+	public Jsonstatus insert(HttpServletRequest req, ordermain b) {
+		switch (b.getOrdertype()) {
+		case 1://充值单
+			//设置无关数据默认值
+			b.setClientid(0);
+			b.setDestshopid(0);
+			b.setStatus(0);
+			b.setVipamount(0);
+			
+			//相关数据默认值
+			b.setUserid(1);
+			b.setCreatedate(autoCreate.Now());
+			break;
+		case 2://会员退款单
+			//设置无关数据默认值
+			b.setClientid(0);
+			b.setDestshopid(0);
+			b.setStatus(0);
+			b.setVipamount(0);
+			
+			//相关数据默认值
+			b.setUserid(1);
+			b.setCreatedate(autoCreate.Now());
+			break;
+		default:
+			break;
+		}
+		return super.insert(req, b);
+	}
+}

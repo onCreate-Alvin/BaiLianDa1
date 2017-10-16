@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="../uimaker/easyui.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/icon.css" />
+<link rel="stylesheet" type="text/css" href="../uimaker/panel.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/linkbutton.css">
+
+<script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../easyui/1.5.3/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../js/print.js"></script>
+<script type="text/javascript" src="../SeachFramework/seach.js"></script>
+
+</head>
+<body >
+    <!-- Begin of toolbar -->
+    <div id="operatortb">
+       <a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="openAdd()" plain="true">添加</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-edit" onclick="openEdit()" plain="true">修改</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove1()" plain="true">删除</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-reload" onclick="reload()" plain="true">刷新</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-print" onclick="openPrint()" plain="true">打印</a>
+       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="allseach('user_search');">自定义查询</a>
+       <a href="javascript:void(0)" isopen="0" onclick="batchop(this)"  class="easyui-linkbutton" >打开批量处理</a>
+    </div>
+    <!-- End of toolbar -->
+    <table id="operatordg" class="easyui-datagrid"></table>
+
+<!-- Begin of easyui-dialog -->
+<div id="operator_dialog" class="easyui-dialog " data-options="closed:true,iconCls:'icon-save'" style="width:600px; padding:10px">
+	<form id="operator_form" method="post">
+        <table>
+            <tr>
+                <td width="60px" align="right">姓名:</td>
+                <td><input type="text" name="name"  class="easyui-validatebox"  data-options="required:true"/></td>
+           		
+           		<td width="60px" align="right">生日:</td>
+                <td><input type="text" name="birthdate" class="easyui-datebox"  data-options="editable:false,required:true"/></td>
+           		
+           		<td rowspan="8" align="right">权限选择:
+           		<div style="height: 300px;width:120px;border: 1px  red">
+           			weq
+           		</div>
+           		
+           		</td>
+            </tr>
+            <tr>
+                <td width="60" align="right">性别:</td>
+                <td><input type="text"  class="easyui-combobox" name="sex"  data-options="required:true,editable:false,valueField:'0',textField:'1',url:'../user/sexlist'"></td>
+           		
+           		
+           		<td width="60" align="right">电话:</td>
+                <td><input type="number" name="tel"  class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+             <tr>
+                <td width="60" align="right">编号:</td>
+                <td><input type="text" name="code" class="easyui-validatebox"  data-options="required:true"/></td>
+           		<td width="60" align="right">手机:</td>
+                <td><input type="number" maxlength="11" name="telmov"  class="easyui-validatebox"  data-options="required:true,validType:'phoneNum'"/></td>
+            </tr>
+             <tr>
+                <td width="60" align="right">所在店:</td>
+                 <td><input type="text"  class="easyui-combobox" name="shopid"  data-options=" required:true,editable:false,valueField:'id',textField:'name',url:'../user/shoplist'"></td>
+           		
+           		<td width="60" align="right">就职时间:</td>
+              <td><input type="text" name="enterdate" class="easyui-datebox"  data-options="editable:false,required:true"/></td>
+            </tr>
+             <tr>
+                <td width="60" align="right">状态:</td>
+                <td><input type="text"  class="easyui-combobox" name="status"  data-options=" required:true,editable:false,valueField:'0',textField:'1',url:'../user/statuslist'"></td>
+           		
+           		<td width="60" align="right">离职时间:</td>
+                 <td><input type="text" name="exitdate" class="easyui-datebox"  data-options="editable:false,required:true"/></td>
+            </tr>
+             <tr>
+                <td width="60" align="right">身份证号:</td>
+                <td colspan="3"><input style="width:388px" type="text" name="ccode" class="easyui-validatebox"  data-options="required:true,validType:'idcared'"/></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">地址:</td>
+                <td colspan="3"><input style="width:388px" type="text" name="addr" class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">备注:</td>
+                <td colspan="3"><textarea  name ="fexp" rows="3" style="width: 386px;height: 65px;resize: none;"></textarea></td>
+            </tr>
+        </table>
+    </form>
+    
+</div>
+
+<div id="operatorprint">
+<iframe id="operatoriframe" style="width: 100%; border: 0px;height: 100%;align:center" >
+	
+</iframe>
+</div>
+
+<!-- 打印弹出框菜单栏 -->
+<div class="menutb">
+	<a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.file'">文件</a>
+   
+    <a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.setting'">设置</a>
+	<div class="file" style="width:150px;">
+	    <div class="menu-sep">11</div>
+	    <div>保存到PDF</div>
+	    <div>打印</div>
+	    <div class="menu-sep"></div>
+	</div>
+	
+	<div class="setting" style="width:150px;">
+	    <div>显示制表时间</div>
+	    <div>不显示制表时间</div>
+	</div>
+</div>
+<div id="usersearch"></div>
+	<script type="text/javascript">
+    function allseach(name) {
+    	//name 为资源文件
+		
+		$('#usersearch').dialog({
+			closed: false,
+			modal:true,
+            title: "自定义查询",
+            top:0,
+            left:280,
+            href:"../allsearch?name=all&cmd="+name,
+            width:550,
+            height:400,
+            buttons: [{
+                text: '清空',
+                iconCls: 'icon-reload',
+                handler:clearbt
+            }, {
+                text: '添加',
+                iconCls: 'icon-add',
+                handler:addbt
+            }, {
+                text: '查询',
+                iconCls: 'icon-ok',
+                handler:seachbt
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#usersearch').dialog('close');                    
+                }
+            }
+            ]
+        });
+	}
+	function seachbt() {
+			/* 将生成的查询条件放入obj */
+			var obj = {};
+			
+			for ( var i = 0; i < $("li").size(); i++) {
+				var li = $($("li").get(i));
+				obj["col" + i] = li.children(".opt").attr("col");
+				obj["type" + i] = li.children(".opt").attr("type");
+				obj["math" + i] = li.children(".math").val();
+				obj["andor" + i] = li.children(".andor").val();
+				obj["value" + i] = li.find(".i" + i).val();
+				obj["valuea" + i] = li.find(".ia" + i).val();
+			}
+			$.getJSON("../allsearch?name=sql&count="+$("li").size(), obj, function(json) {
+				$('#usersearch').dialog('close');     
+				//数据刷新
+				$('#operatordg').datagrid('load',{
+					where:" where "+json.sql
+				});
+				$('#operatordg').datagrid('reload',{
+					where:" where "+json.sql
+				});
+				
+			});
+		}
+
+		function clearbt() {
+			$(".seach").empty();
+			addbt();
+		}
+		function addbt() {
+			my.additem();
+		}
+    </script>
+
+	<script>
+	/* 打开打印窗口，需要引用print.js */
+	/* 打印窗口 */
+	function openPrint(){
+		openPrintdl('操作员','#operatordg','#operatorprint','#operatoriframe');//该方法在print.js中
+	}
+	/* 打印菜单栏监听 */
+	/* 在print.js中 */
+		
+		
+	/* 数据显示 */	
+	$('#operatordg').datagrid({
+			title:'全部操作员',
+			url:'../user/init',//数据源
+			rownumbers:true,
+			singleSelect:true,
+			autoRowHeight:false,
+			pageSize:10,  
+			striped:true,       
+			pagination:true,
+			toolbar:'#operatortb',
+			fitColumns:true,
+			fit:true,
+			columns:[[
+				{field:'code',title:'操作员编号',width:100,sortable:true},
+				{field:'name',title:'操作员名称',width:180,sortable:true},
+				{field:'sexname',title:'操作员性别',width:180,sortable:false},
+				{field:'telmov',title:'操作员手机',width:180,sortable:true},
+				{field:'operatorstatus',title:'操作员状态',width:180,sortable:false},
+				{field:'u_name',title:'创建人名称',width:180,sortable:false},
+				{field:'opt',title:'操作' ,align:'center',
+					formatter:function(value,rec){
+						var btn = "<a class='' href='javascript:void(0)' onclick='modify_pwd()'>重置密码</a>"
+						return btn;						
+					}
+				}
+			]],
+			onDblClickRow:function (rowIndex,rowData){
+				openEdit();
+			}
+		});
+		
+	/* 修改密码 */
+	function modify_pwd(){
+		alert(1);
+	}
+	
+	/* 打开新增窗口 */
+	function openAdd(){
+		$('#operator_form').form('clear');
+		$('#operator_dialog').dialog({
+			closed: false,
+			modal:true,
+            title: "新增",
+            top:0,
+            left:200,
+            buttons: [{
+                text: '确定',
+                iconCls: 'icon-ok',
+                handler: add
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#operator_dialog').dialog('close');                    
+                }
+            }]
+        });
+	}
+	/**
+	* Name 添加记录
+	*/
+	function add(){
+		$('#operator_form').form('submit', {
+			url:'../user/insert',
+			success:function(data){
+				if(data){
+					/* $.messager.alert('信息提示','提交成功！','info'); */
+					$('#operator_dialog').dialog('close');
+					$('#operatordg').datagrid('reload',{
+					});
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	
+	/**
+	* Name 打开修改窗口
+	*/
+	function openEdit(){
+		$('#operator_form').form('clear');
+		var item = $('#operatordg').datagrid('getSelected');
+		if(item){
+			$('#operator_form').form('load',item);
+			$('#operator_dialog').dialog({
+				closed: false,
+				modal:true,
+	           	top:0,
+            	left:200,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#operator_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+		}else{
+			$.messager.confirm('信息提示','请选择需要修改的行', function(result){});
+		}
+	}
+	/**
+	* Name 修改记录
+	*/
+	function edit(){
+		var item = $('#operatordg').datagrid('getSelected');
+		$('#operator_form').form('submit', {
+			url:'../user/update?id='+item.id,
+			success:function(data){
+				if(data){
+					$.messager.alert('信息提示','提交成功！','info');
+					$('#operator_dialog').dialog('close');
+					$('#operatordg').datagrid('reload',{
+								});	
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	
+	/**
+	* Name 删除记录
+	*/
+	function remove1(){
+		var item = $('#operatordg').datagrid('getSelected');
+		if(item){
+			$.messager.confirm('信息提示','确定要删除该记录？', function(result){
+				if(result){
+					var items = $('#operatordg').datagrid('getSelections');
+					var ids = [];
+					$(items).each(function(){
+						ids.push(this.id);	
+					});
+					//alert(ids);return; 
+					$.ajax({
+						url:'../user/del?ids='+ids,
+						success:function(data){
+							if(data){
+								$.messager.alert('信息提示','删除成功！','info');	
+								$('#operatordg').datagrid('reload',{
+									});	
+							}
+							else
+							{
+								$.messager.alert('信息提示','删除失败！','info');		
+							}
+						}	
+					});
+				}	
+			});
+		}else{
+			$.messager.confirm('信息提示','请选择需要删除的行', function(result){});
+		}
+	}
+	/* 批量按钮 */
+	function batchop(o){
+		if($(o).attr("isopen")==0){
+			$(o).text("关闭批量删除");
+			$(o).attr("isopen","1");
+			$('#operatordg').datagrid({
+				singleSelect:false,
+			});
+		
+		}else{
+			$(o).text("打开批量删除");
+			$(o).attr("isopen","0");
+			$('#operatordg').datagrid({
+				singleSelect:true,
+			});
+		}
+	}
+	/* 打开自定义查询器 */
+	function openSearch(){
+		$('#operator_form').form('clear');
+		$('#operator_form').form('load',item);
+		$('#operator_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#operator_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+	}
+	
+    
+	</script>
+	<script type="text/javascript" src="../js/yanzheng.js"></script>
+</body>
+</html>

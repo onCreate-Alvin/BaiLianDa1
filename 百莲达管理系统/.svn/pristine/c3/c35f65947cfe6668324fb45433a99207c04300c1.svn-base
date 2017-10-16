@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="../uimaker/easyui.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/icon.css" />
+<link rel="stylesheet" type="text/css" href="../uimaker/panel.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/linkbutton.css">
+
+<script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../easyui/1.5.3/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../js/print.js"></script>
+<script type="text/javascript" src="../SeachFramework/seach.js"></script>
+</head>
+<body>
+    <!-- Begin of toolbar -->
+    <div id="clienttb">
+    	
+    	开始日期<input type="text" name="sdate" class="easyui-datebox"  data-options="editable:false,required:true"/>
+    	结束日期<input type="text" name="ddate" class="easyui-datebox"  data-options="editable:false,required:true"/>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="tj()" plain="true">统计</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-reload" onclick="reload()" plain="true">刷新</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-print" onclick="openPrint()" plain="true">打印</a>
+       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="allseach('products_search');">加入查询条件</a>
+
+     
+    </div>
+    <!-- End of toolbar -->
+    <table id="clientdg" class="easyui-datagrid"></table>
+
+<!-- Begin of easyui-dialog -->
+<div id="client_dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:540px; padding:10px;">
+	<form id="client_form" method="post">
+        <table>
+            <tr>
+                <td width="80" align="right">供货商编号:</td>
+                <td><input type="text" name="code"  class="easyui-validatebox"  data-options="required:true"/></td>
+            	<td width="80" align="right">供应商电话:</td>
+                <td><input type="text" name="tel" class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+            <tr>
+                <td width="80" align="right">供货商姓名:</td>
+                <td><input type="text" name="name" class="easyui-validatebox"  data-options="required:true"/></td>
+            	<td width="80" align="right">供应商手机:</td>
+                <td><input type="text" name="telmov" class="easyui-validatebox"  data-options="required:true,validType:'phoneNum'"/></td>
+            </tr>
+            <tr>
+                <td width="80" align="right">联系人姓名:</td>
+                <td><input type="text" name="lxr"  class="easyui-validatebox"  data-options="required:true"/></td>
+            	<td width="80" align="right">银行账户:</td>
+                <td><input type="text" name="bank"  class="easyui-validatebox"  data-options="required:true,validType:'isbankcard'"/></td>
+            </tr>
+            <tr>
+                <td width="80" align="right">供应商地址:</td>
+                <td colspan="3"><input style="width:400px" type="text" name="addr" class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+            <tr>
+                <td width="80" align="right">备注:</td>
+                <td colspan="3"><textarea  name ="fexp" rows="3" style="width: 398px;height: 65px;resize: none;"></textarea></td>
+            </tr>
+        </table>
+    </form>
+</div>
+<div id="clientprint">
+<iframe id="clilentiframe" style="width: 100%; border: 0px;height: 100%;align:center" >
+	
+</iframe>
+</div>
+
+<!-- 打印弹出框菜单栏 -->
+<div class="menutb">
+	<a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.file'">文件</a>
+    <a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.setting'">设置</a>
+	<div class="file" style="width:150px;">
+	    <div>保存到PDF</div>
+	    <div>打印</div>
+	    <div class="menu-sep"></div>
+	</div>
+	<div class="setting" style="width:150px;">
+	    <div>显示制表时间</div>
+	    <div>不显示制表时间</div>
+	</div>
+</div>
+    
+    <div id="clientsearch"></div>
+	<script type="text/javascript">
+	function tj(){
+		var sdate = $("[name=sdate]").val();
+		var ddate = $("[name=ddate]").val();
+		var url = "../tj/product?sdate="+sdate+"&ddate="+ddate;
+		$('#clientdg').datagrid('reload',url);
+	}
+	
+    function allseach(name) {
+    	//name 为资源文件
+		
+		$('#clientsearch').dialog({
+			closed: false,
+			modal:true,
+            title: "自定义查询",
+            top:0,
+            left:280,
+            href:"../allsearch?name=all&cmd="+name,
+            width:550,
+            height:400,
+            buttons: [{
+                text: '清空',
+                iconCls: 'icon-reload',
+                handler:clearbt
+            }, {
+                text: '添加',
+                iconCls: 'icon-add',
+                handler:addbt
+            }, {
+                text: '查询',
+                iconCls: 'icon-ok',
+                handler:seachbt
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#clientsearch').dialog('close');                    
+                }
+            }
+            ]
+        });
+	}
+	function seachbt() {
+			/* 将生成的查询条件放入obj */
+			var obj = {};
+			for ( var i = 0; i < $("li").size(); i++) {
+				var li = $($("li").get(i));
+				obj["col" + i] = li.children(".opt").attr("col");
+				obj["type" + i] = li.children(".opt").attr("type");
+				obj["math" + i] = li.children(".math").val();
+				obj["andor" + i] = li.children(".andor").val();
+				obj["value" + i] = li.find(".i" + i).val();
+				obj["valuea" + i] = li.find(".ia" + i).val();
+			}
+			$.getJSON("../allsearch?name=sql&count="+$("li").size(), obj, function(json) {
+				$('#clientsearch').dialog('close');     
+				//数据刷新
+				$('#clientdg').datagrid('load',{
+					where:" where "+json.sql
+				});
+				$('#clientdg').datagrid('reload',{
+					where:" where "+json.sql
+				});
+				
+			});
+		}
+
+		function clearbt() {
+			$(".seach").empty();
+			addbt();
+		}
+		function addbt() {
+			my.additem();
+		}
+    </script>
+
+	<script>
+	/* 打印窗口 */
+	function openPrint(){
+		openPrintdl('操作员统计表','#clientdg','#clientprint','#clilentiframe');//该方法在print.js中
+	}
+	
+		$('#clientdg').datagrid({
+			title:'操作员统计表',
+			url:'',//数据源
+			rownumbers:true,
+			singleSelect:true,
+			autoRowHeight:false,  
+			striped:true,       
+			pagination:false,
+			toolbar:'#clienttb',
+			fitColumns:true,
+			fit:true,
+			columns:[[
+				{field:'productname',title:'商品名称',width:75,sortable:true},
+				{ field:'incount',title:'采购数量',width:75,sortable:true},
+				{ field:'inamount',title:'采购金额',width:75,sortable:true},
+				{ field:'intcount',title:'采购退货数量',width:100,sortable:true},
+				{ field:'intamount',title:'采购退货金额',width:100,sortable:true},
+				{ field:'outcount',title:'销售数量',width:75,sortable:true},
+				{ field:'outcount',title:'项目销售数量',width:100,sortable:true},
+				{ field:'outamount',title:'销售金额',width:75,sortable:true},
+				{ field:'outtcount',title:'销售退货数量',width:100,sortable:true},
+				{ field:'outtcount',title:'项目退货数量',width:100,sortable:true},
+				{ field:'outtamount',title:'销售退货金额',width:100,sortable:true},
+				{ field:'movcount',title:'移库数量',width:75,sortable:true},
+				{ field:'movamount',title:'移库金额',width:75,sortable:true},
+				{ field:'scount',title:'库损数量',width:75,sortable:true},
+				{ field:'samount',title:'库损金额',width:75,sortable:true},
+				{ field:'ycount',title:'库溢数量',width:75,sortable:true},
+				{ field:'yamount',title:'库溢金额',width:75,sortable:true}
+			]],
+			onDblClickRow:function (rowIndex,rowData){
+				openEdit();
+			}
+		});
+	/* 打开新增窗口 */
+	function openAdd(){
+		$('#client_form').form('clear');
+		$('#client_dialog').dialog({
+			closed: false,
+			modal:true,
+            title: "新增",
+            top:40,
+            left:280,
+            buttons: [{
+                text: '确定',
+                iconCls: 'icon-ok',
+                handler: add
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#client_dialog').dialog('close');                    
+                }
+            }]
+        });
+	}
+	/**
+	* Name 添加记录
+	*/
+	function add(){
+		$('#client_form').form('submit', {
+			url:'../client/insert',
+			success:function(data){
+				if(data){
+					/* $.messager.alert('信息提示','提交成功！','info'); */
+					$('#client_dialog').dialog('close');
+					$('#clientdg').datagrid('reload',{
+					});
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	/**
+	* Name 打开修改窗口
+	*/
+	function openEdit(){
+		$('#client_form').form('clear');
+		var item = $('#clientdg').datagrid('getSelected');
+		if(item){
+			$('#client_form').form('load',item);
+			$('#client_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#client_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+		}else{
+			$.messager.confirm('信息提示','请选择需要修改的行', function(result){});
+		}
+	}
+	/**
+	* Name 修改记录
+	*/
+	function edit(){
+		var item = $('#clientdg').datagrid('getSelected');
+		$('#client_form').form('submit', {
+			url:'../client/update?id='+item.id,
+			success:function(data){
+				if(data){
+					$.messager.alert('信息提示','提交成功！','info');
+					$('#client_dialog').dialog('close');
+					$('#clientdg').datagrid('reload',{
+								});	
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	
+	/**
+	* Name 删除记录
+	*/
+	function remove1(){
+		var item = $('#clientdg').datagrid('getSelected');
+		if(item){
+			$.messager.confirm('信息提示','确定要删除该记录？', function(result){
+				if(result){
+					var items = $('#clientdg').datagrid('getSelections');
+					var ids = [];
+					$(items).each(function(){
+						ids.push(this.id);	
+					});
+					//alert(ids);return; 
+					$.ajax({
+						url:'../client/del?ids='+ids,
+						success:function(data){
+							if(data){
+								$.messager.alert('信息提示','删除成功！','info');	
+								$('#clientdg').datagrid('reload',{
+									});	
+							}
+							else
+							{
+								$.messager.alert('信息提示','删除失败！','info');		
+							}
+						}	
+					});
+				}	
+			});
+		}else{
+			$.messager.confirm('信息提示','请选择需要删除的行', function(result){});
+		}
+	}
+	/* 批量按钮 */
+	function batchop(o){
+		if($(o).attr("isopen")==0){
+			$(o).text("关闭批量删除");
+			$(o).attr("isopen","1");
+			$('#clientdg').datagrid({
+				singleSelect:false,
+			});
+		
+		}else{
+			$(o).text("打开批量删除");
+			$(o).attr("isopen","0");
+			$('#clientdg').datagrid({
+				singleSelect:true,
+			});
+		}
+	}
+	</script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="../uimaker/easyui.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/icon.css" />
+<link rel="stylesheet" type="text/css" href="../uimaker/panel.css">
+<link rel="stylesheet" type="text/css" href="../uimaker/linkbutton.css">
+
+<script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../easyui/1.5.3/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../js/print.js"></script>
+<script type="text/javascript" src="../SeachFramework/seach.js"></script>
+</head>
+<body>
+    <!-- Begin of toolbar -->
+    <div id="viptypetb">
+       <a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="openAdd()" plain="true">添加</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-edit" onclick="openEdit()" plain="true">修改</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove1()" plain="true">删除</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-reload" onclick="reload()" plain="true">刷新</a>
+       <a href="#" class="easyui-linkbutton" iconCls="icon-print" onclick="openPrint()" plain="true">打印</a>
+       <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="openSearch()">查询</a>
+       <a href="javascript:void(0)" isopen="0" onclick="batchop(this)"  class="easyui-linkbutton" >打开批量处理</a>
+    </div>
+    <!-- End of toolbar -->
+    <table id="viptypedg" class="easyui-datagrid"></table>
+
+<!-- Begin of easyui-dialog -->
+<div id="viptype_dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:400px; padding:10px;">
+	<form id="viptype_form" method="post">
+        <table>
+            <tr>
+                <td width="60" align="right">商品类别:</td>
+                <td><input type="text" name="name" style="width:260px" class="easyui-validatebox"  data-options="required:true"/></td>
+            </tr>
+           
+            <tr>
+                <td valign="top" align="right">备注:</td>
+                <td><textarea name="fexp" rows="6"  style="width:258px;height: 65px;"></textarea></td>
+            </tr>
+        </table>
+    </form>
+</div>
+<div id="viptypeprint">
+<iframe id="viptypeiframe" style="width: 100%; border: 0px;height: 100%;align:center" >
+	
+</iframe>
+</div>
+
+<!-- 打印弹出框菜单栏 -->
+<div class="menutb">
+	<a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.file'">文件</a>
+   
+    <a href="javascript:void(0)" id="mb" class="easyui-menubutton"
+    data-options="menu:'.setting'">设置</a>
+	<div class="file" style="width:150px;">
+	    <div class="menu-sep">11</div>
+	    <div>保存到PDF</div>
+	    <div>打印</div>
+	    <div class="menu-sep"></div>
+	</div>
+	
+	<div class="setting" style="width:150px;">
+	    <div>显示制表时间</div>
+	    <div>不显示制表时间</div>
+	</div>
+</div>
+	<script>
+	/* 打印窗口 */
+	function openPrint(){
+		openPrintdl('商品类别','#viptypedg','#viptypeprint','#viptypeiframe');//该方法在print.js中
+	}
+	
+		$('#viptypedg').datagrid({
+			title:'全部商品类型',
+			url:'../viptype/init',//数据源
+			rownumbers:true,
+			singleSelect:true,
+			autoRowHeight:false,
+			pageSize:10,  
+			striped:true,       
+			pagination:true,
+			toolbar:'#viptypetb',
+			fitColumns:true,
+			fit:true,
+			columns:[[
+				{field:'name',title:'商品类型名称',width:100,sortable:true},
+				{ field:'fexp',title:'商品类型备注',width:180,sortable:true}
+			]],
+			onDblClickRow:function (rowIndex,rowData){
+				openEdit();
+			}
+		});
+	/* 打开新增窗口 */
+	function openAdd(){
+		$('#viptype_form').form('clear');
+		$('#viptype_dialog').dialog({
+			closed: false,
+			modal:true,
+            title: "新增",
+            top:40,
+            left:280,
+            buttons: [{
+                text: '确定',
+                iconCls: 'icon-ok',
+                handler: add
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#viptype_dialog').dialog('close');                    
+                }
+            }]
+        });
+	}
+	/**
+	* Name 添加记录
+	*/
+	function add(){
+		$('#viptype_form').form('submit', {
+			url:'../viptype/insert',
+			success:function(data){
+				if(data){
+					/* $.messager.alert('信息提示','提交成功！','info'); */
+					$('#viptype_dialog').dialog('close');
+					$('#viptypedg').datagrid('reload',{
+					});
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	/**
+	* Name 打开修改窗口
+	*/
+	function openEdit(){
+		$('#viptype_form').form('clear');
+		var item = $('#viptypedg').datagrid('getSelected');
+		if(item){
+			$('#viptype_form').form('load',item);
+			$('#viptype_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#viptype_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+		}else{
+			$.messager.confirm('信息提示','请选择需要修改的行', function(result){});
+		}
+	}
+	/**
+	* Name 修改记录
+	*/
+	function edit(){
+		var item = $('#viptypedg').datagrid('getSelected');
+		$('#viptype_form').form('submit', {
+			url:'../viptype/update?id='+item.id,
+			success:function(data){
+				if(data){
+					$.messager.alert('信息提示','提交成功！','info');
+					$('#viptype_dialog').dialog('close');
+					$('#viptypedg').datagrid('reload',{
+								});	
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		});
+	}
+	
+	/**
+	* Name 删除记录
+	*/
+	function remove1(){
+		var item = $('#viptypedg').datagrid('getSelected');
+		if(item){
+			$.messager.confirm('信息提示','确定要删除该记录？', function(result){
+				if(result){
+					var items = $('#viptypedg').datagrid('getSelections');
+					var ids = [];
+					$(items).each(function(){
+						ids.push(this.id);	
+					});
+					//alert(ids);return; 
+					$.ajax({
+						url:'../viptype/del?ids='+ids,
+						success:function(data){
+							if(data){
+								$.messager.alert('信息提示','删除成功！','info');	
+								$('#viptypedg').datagrid('reload',{
+									});	
+							}
+							else
+							{
+								$.messager.alert('信息提示','删除失败！','info');		
+							}
+						}	
+					});
+				}	
+			});
+		}else{
+			$.messager.confirm('信息提示','请选择需要删除的行', function(result){});
+		}
+	}
+	/* 批量按钮 */
+	function batchop(o){
+		if($(o).attr("isopen")==0){
+			$(o).text("关闭批量删除");
+			$(o).attr("isopen","1");
+			$('#viptypedg').datagrid({
+				singleSelect:false,
+			});
+		
+		}else{
+			$(o).text("打开批量删除");
+			$(o).attr("isopen","0");
+			$('#viptypedg').datagrid({
+				singleSelect:true,
+			});
+		}
+	}
+	/* 打开自定义查询器 */
+	function openSearch(){
+		$('#viptype_form').form('clear');
+		$('#viptype_form').form('load',item);
+		$('#viptype_dialog').dialog({
+				closed: false,
+				modal:true,
+	            title: "修改信息",
+	            buttons: [{
+	                text: '确定',
+	                iconCls: 'icon-ok',
+	                handler: edit
+	            }, {
+	                text: '取消',
+	                iconCls: 'icon-cancel',
+	                handler: function () {
+	                    $('#viptype_dialog').dialog('close');                    
+	                }
+	            }]
+	        });
+	}
+	</script>
+</body>
+</html>

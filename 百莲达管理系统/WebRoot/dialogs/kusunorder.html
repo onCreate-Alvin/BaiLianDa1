@@ -1,0 +1,185 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+
+</head>
+<body>
+	<form id="chongzhiform" method="post">
+		<table style="width: 900px;margin: auto"  >
+			<tr>
+				<input type="text" name="ordertype" value="8" style="display: none">
+				<td width="60">单据号:</td>
+				<td ><input type="text" name="ordercode" class="easyui-validatebox margintop10" data-options="required:true"/></td>
+				<td align="center" colspan="4" rowspan="2" style="text-align: center;font-size: 25px;width: 50%">库损单</td>
+				<td width="60" style="text-align:right">分店:</td>
+				<td><input type="text"  class="easyui-combobox" name="shopid" id="chongzhishopid" data-options=" required:true,editable:false,valueField:'id',textField:'name',url:'/bld/AllSeach/shop'"></td>
+			</tr>
+			<tr>
+				<td width="60">单据日期:</td>
+				<td><input type="text" name="orderdate" class="easyui-datebox"  data-options="editable:false,required:true,disabled:false" /></td>
+				
+			</tr>
+			
+			<tr>
+				<td valign="top" width="60">地址:</td>
+				<td colspan="7"><input style="width: 98%" data-options="editable:false" type="text" name="addr" class="margintop10 noborder easyui-validatebox" /></td>
+			</tr>
+			<tr>
+				<td valign="top"  width="60" style="line-height: 36px">备注:</td>
+				<td colspan="7"><textarea name="fexp"  rows="1" style="width:98%;resize: none;" class="margintop10 easyui-validatebox" ></textarea></td>
+			</tr>
+			<tr style="display: none">
+				<td width="60" >总金额:</td>
+				<td><input type="text" name="amount"  class="margintop10 easyui-validatebox noborder" data-options="editable:false" /></td>
+				<td width="60" style="text-align:right">总积分:</td>
+				<td><input type="text" name="point" class="easyui-validatebox noborder" data-options="editable:false" /></td>
+			</tr>
+		</table>
+	</form>
+	<form id="productczform" method="post">
+		<table style="width: 900px;margin: auto"  >
+		<tr>
+				<td width="60" >助记码:</td>
+				<td><input type="text"  class="easyui-combobox margintop10 " name="productid" data-options=" required:true,editable:true,valueField:'id',textField:'zjm',url:'/bld/AllSeach/product'"></td>
+				<td width="60" style="text-align:right">数量:</td>
+				<td ><input  type="text" name="detailcount" class="easyui-validatebox  " data-options="editable:true"/></td>
+				<td width="60" style="text-align:right">单价:</td>
+				<td ><input  type="text" name="detailprice" class="easyui-validatebox  " data-options="editable:true"/></td>
+				<td><input type="button"  value="添加" onclick="submitdetail();"></td>
+			</tr>
+			<tr style="height: 120px">
+				<td colspan="8" width="100%">
+				
+				
+				<div name="orderdetailsdg" id="orderdetailsdg">
+				</div>
+				
+				
+				</td>
+			</tr>
+			<tr>
+				<td width="60" >总金额:</td>
+				<td><input type="text" name="amount"  class="margintop10 easyui-validatebox noborder" data-options="editable:false" /></td>
+				<td width="60" style="text-align:right">总积分:</td>
+				<td><input type="text" name="point" class="easyui-validatebox noborder" data-options="editable:false" /></td>
+			</tr>
+			</table>
+		</form>
+	<script type="text/javascript">
+		var mydata=[];
+		
+		function resum(){
+		var sum=0;
+		var pointsum=0;
+			var rows = $('#orderdetailsdg').datagrid("getRows");
+			for(var i =0;i<rows.length;i++){
+				sum=sum+rows[i].amount;
+				pointsum+=rows[i].point;
+			}
+			$('[name=amount]').val(sum);
+			$('[name=point]').val(pointsum);		
+		}
+		
+		
+		function submitdetail(){
+	    $('#productczform').form('submit', {
+			url:'/bld/orderdetail/zjm',
+			success:function(data){
+				if(data){
+				var json = eval('(' + data + ')'); 
+				mydata.push(json);
+				$('#orderdetailsdg').datagrid({
+					data:mydata
+				});
+				resum();
+				
+				}
+				else
+				{
+					$.messager.alert('信息提示','提交失败！','info');
+				}
+			}
+		}); 
+		
+		}
+
+		$('#orderdetailsdg').datagrid({
+			
+			rownumbers:false,
+			singleSelect:true,
+			autoRowHeight:false,
+			pageSize:10,  
+			striped:true,       
+			pagination:false,
+			fitColumns:true,
+			fit:true,
+			columns:[[
+				{field:'pcode',title:'商品编号',width:100,sortable:true},
+				{ field:'pname',title:'商品名称',width:180,sortable:true},
+				{ field:'count',title:'数量',width:100,sortable:true},
+				{ field:'fexp',title:'明细备注',width:100,sortable:true,
+					editor:{
+						type:'checkbox',
+						options:{
+							required:true
+						}
+					}
+				
+				},
+				{field:'opt',title:'操作' ,align:'center',
+					formatter:function(value,rec){
+						var btn = "<a class='' href='javascript:void(0)' onclick='deleterow(this)'>删除</a>"
+						return btn;						
+					}
+				}
+			]],
+		});
+		
+		function deleterow(target){
+		$.messager.confirm('Confirm','确定删除？',function(r){
+			if (r){
+				$('#orderdetailsdg').datagrid('deleteRow', getRowIndex(target));
+				resum();
+			}
+		});
+		}
+		function getRowIndex(target){
+		var tr = $(target).closest('tr.datagrid-row');
+		return parseInt(tr.attr('datagrid-row-index'));
+	}
+	
+	</script>
+	<script type="text/javascript">
+		$(function(){
+			$("#chongzhivipid").combobox({
+				onSelect: function (rec) {
+					$("[name='addr']").val(rec.addr);
+				}
+			});
+					/* 当前时间 */
+			formatterDate1 = function(date) {
+			var day = date.getDate() > 9 ? date.getDate() : "0" + date.getDate();
+			var month = (date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : "0"
+			+ (date.getMonth() + 1);
+			return date.getFullYear() + '-' + month + '-' + day;
+			};
+			
+			$('[name=orderdate]').val(formatterDate1(new Date()));
+			
+		});
+	</script>
+
+		<style type="text/css">
+.margintop10{
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+.noborder{
+border: 0px;
+}
+</style>
+</body>
+</html>

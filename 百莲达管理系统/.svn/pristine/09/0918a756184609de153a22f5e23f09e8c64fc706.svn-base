@@ -1,0 +1,69 @@
+<%@ page language="java" contentType="text/html;charset=UTF-8"
+    pageEncoding="utf-8"%>
+<!DOCTYPE html>
+<html >
+<head>
+    <title>数据打印</title>
+<script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
+</head>
+<body >
+		<div style="width: 90%;margin: auto;">
+			<div style="width: 100% ;margin: auto;background-image: url(uimaker/imgs/bldlog.png)" id="zoomwidth" >
+					<div style="width: 85% ;margin: auto " id="zoomwidth" >
+						${param.contentstring}	
+						<div style="margin-top: 20px;margin-bottom: 20px">
+							<table width="100%">
+								<tr>
+									<td align="right" width="20%">公司盖章：</td>
+									<td width="30%"></td>
+									<td align="right" width="20%">负责人签字：</td>
+									<td width="30%"></td>
+							</table>
+							<div align="right" id="isdate" style="margin-top: 10px">制表时间：<span id="nowdate"></span></div>
+						</div>
+					</div>
+			</div>
+		</div>
+<style type="text/css">
+ body{background:white;margin:0px;padding:0px;font-size:13px;text-align:left;margin: 10px}
+.pb{border-collapse:collapse;}
+.pb th{font-weight:bold;text-align:center;border:1px solid #333333;padding:2px;}
+.pb td{border:1px solid #333333;padding:2px;text-align:center}
+</style>
+		<script type="text/javascript">
+		/* 打印 */
+		function woyaoprint(){
+			this.window.print();
+		}
+		/* 改变表大小 */
+		function changezoom(zoomsize){
+			document.getElementById("zoomwidth").style.width=zoomsize;
+		}
+		/* 获取当前时间 */
+		function getNowFormatDate() {
+			    var date = new Date();
+			    var seperator1 = "-";
+			    var seperator2 = ":";
+			    var month = date.getMonth() + 1;
+			    var strDate = date.getDate();
+			    if (month >= 1 && month <= 9) {
+			        month = "0" + month;
+			    }
+			    if (strDate >= 0 && strDate <= 9) {
+			        strDate = "0" + strDate;
+			    }
+			    var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+			            + " " ;
+			    return currentdate;
+			}
+		var now = getNowFormatDate();
+		$("#nowdate").text(now);
+			function closedate(){
+			document.getElementById("isdate").style.display="none";
+			}
+			function opendate(){
+			document.getElementById("isdate").style.display="block";
+			}
+		</script>
+</body>
+</html>
